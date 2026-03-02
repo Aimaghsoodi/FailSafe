@@ -1,0 +1,45 @@
+{
+  "name": "@failsafe/api",
+  "version": "0.1.0",
+  "description": "FailSafe REST API server — expose failure management and risk detection via HTTP",
+  "main": "dist/server.js",
+  "types": "dist/server.d.ts",
+  "scripts": {
+    "build": "tsup src/server.ts src/index.ts --format cjs --dts --sourcemap",
+    "start": "node dist/server.js",
+    "dev": "tsx src/server.ts",
+    "test": "vitest run --coverage",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "failsafe",
+    "api",
+    "rest",
+    "hono",
+    "failure",
+    "risk",
+    "detection"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@failsafe/core": "workspace:*",
+    "@hono/node-server": "^1.8.0",
+    "hono": "^4.0.0",
+    "nanoid": "^5.0.0",
+    "better-sqlite3": "^11.0.0",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.0",
+    "@types/cors": "^2.8.17",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "eslint": "^8.50.0",
+    "tsup": "^8.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "id": "report_abc123",
+  "type": "model.inference_error",
+  "severity": "high",
+  "domain": "reasoning",
+  "title": "Model inference timeout",
+  "description": "Claude API inference timed out after 30 seconds",
+  "timestamp": "2026-02-28T12:00:00Z",
+  "verificationStatus": "verified",
+  "version": 1,
+  "createdAt": "2026-02-28T12:00:00Z",
+  "updatedAt": "2026-02-28T12:00:00Z"
+}

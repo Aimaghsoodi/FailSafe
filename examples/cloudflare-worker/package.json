@@ -1,0 +1,17 @@
+{
+  "name": "failsafe-cloudflare-worker",
+  "version": "0.1.0",
+  "description": "FailSafe API on Cloudflare Workers",
+  "main": "src/index.ts",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev"
+  },
+  "dependencies": {
+    "@failsafe/core": "^0.1.0"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0",
+    "typescript": "^5.3.0"
+  }
+}

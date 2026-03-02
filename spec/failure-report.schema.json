@@ -1,0 +1,207 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://failsafe.io/schema/failure-report.schema.json",
+  "title": "FailSafe Failure Report",
+  "description": "Schema for AI failure reports",
+  "type": "object",
+  "required": [
+    "failureId",
+    "timestamp",
+    "category",
+    "type",
+    "severity",
+    "description",
+    "status"
+  ],
+  "properties": {
+    "failureId": {
+      "type": "string",
+      "pattern": "^fail_[a-zA-Z0-9_-]{8,}$",
+      "description": "Unique failure identifier (nanoid format)"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 datetime when failure was discovered"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "legal",
+        "medical",
+        "financial",
+        "coding",
+        "factual",
+        "reasoning",
+        "temporal"
+      ],
+      "description": "Primary failure category"
+    },
+    "type": {
+      "type": "string",
+      "description": "Failure type within category"
+    },
+    "subtype": {
+      "type": "string",
+      "description": "Specific failure subtype"
+    },
+    "severity": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5,
+      "description": "Severity level: 1=Critical, 2=High, 3=Medium, 4=Low, 5=Minimal"
+    },
+    "impact": {
+      "type": "object",
+      "description": "Quantified impact assessment",
+      "properties": {
+        "usersAffected": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "financialImpact": {
+          "type": "number",
+          "minimum": 0
+        },
+        "safetyRisk": {
+          "type": "boolean"
+        },
+        "legalExposure": {
+          "type": "boolean"
+        },
+        "regulatoryImpact": {
+          "type": "string",
+          "enum": [
+            "none",
+            "violation",
+            "enforcement_action_risk"
+          ]
+        }
+      }
+    },
+    "description": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 5000,
+      "description": "Detailed failure description"
+    },
+    "rootCauses": {
+      "type": "array",
+      "description": "Array of contributing root causes",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "description": "Supporting evidence for the failure",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "reproducible": {
+          "type": "boolean"
+        },
+        "reproduceSteps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "data": {
+          "type": "object"
+        }
+      }
+    },
+    "discoveredBy": {
+      "type": "string",
+      "description": "Agent, user, or system that discovered the failure"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "investigating",
+        "resolved",
+        "mitigated",
+        "acknowledged",
+        "in_progress"
+      ],
+      "description": "Current status of the failure"
+    },
+    "remediationSteps": {
+      "type": "array",
+      "description": "Actions taken or planned",
+      "items": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "planned",
+              "in_progress",
+              "completed",
+              "blocked"
+            ]
+          },
+          "owner": {
+            "type": "string"
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "targetResolutionDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "SLA deadline for resolution"
+    },
+    "assignedTo": {
+      "type": "string",
+      "description": "Team or person responsible for remediation"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Searchable tags"
+    },
+    "relatedFailures": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^fail_[a-zA-Z0-9_-]{8,}$"
+      },
+      "description": "IDs of related failures"
+    },
+    "escalationRequired": {
+      "type": "boolean",
+      "description": "Whether escalation is needed"
+    },
+    "escalationPath": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "ceo",
+          "legal",
+          "compliance",
+          "regulatory",
+          "customer",
+          "public"
+        ]
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata"
+    }
+  }
+}

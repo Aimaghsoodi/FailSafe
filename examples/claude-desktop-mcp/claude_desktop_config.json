@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "failsafe": {
+      "command": "failsafe-mcp",
+      "args": ["--storage", "file"],
+      "env": {
+        "FAILSAFE_DB_PATH": "~/.failsafe/failures.json",
+        "FAILSAFE_LOG_LEVEL": "info"
+      }
+    }
+  }
+}

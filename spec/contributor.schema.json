@@ -1,0 +1,189 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://failsafe.io/schema/contributor.schema.json",
+  "title": "FailSafe Failure Contributor",
+  "description": "Schema for failure contributors and root cause factors",
+  "type": "object",
+  "required": [
+    "contributorId",
+    "failureId",
+    "category",
+    "description"
+  ],
+  "properties": {
+    "contributorId": {
+      "type": "string",
+      "pattern": "^contrib_[a-zA-Z0-9_-]{8,}$",
+      "description": "Unique contributor identifier"
+    },
+    "failureId": {
+      "type": "string",
+      "pattern": "^fail_[a-zA-Z0-9_-]{8,}$",
+      "description": "ID of the failure this contributes to"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "human_error",
+        "design_flaw",
+        "implementation_bug",
+        "missing_control",
+        "process_failure",
+        "inadequate_testing",
+        "external_factor",
+        "data_quality",
+        "configuration_error",
+        "integration_issue",
+        "training_gap",
+        "documentation_gap",
+        "environmental_issue"
+      ],
+      "description": "Category of contributing factor"
+    },
+    "subcategory": {
+      "type": "string",
+      "description": "More specific subcategory"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 2000,
+      "description": "How this factor contributed to failure"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "primary",
+        "significant",
+        "contributing",
+        "minor"
+      ],
+      "description": "How significant was this factor"
+    },
+    "rootCause": {
+      "type": "boolean",
+      "description": "Is this a root cause or just a symptom"
+    },
+    "preventable": {
+      "type": "boolean",
+      "description": "Was this preventable"
+    },
+    "detectedEarly": {
+      "type": "boolean",
+      "description": "Could this have been detected earlier"
+    },
+    "affectedComponent": {
+      "type": "string",
+      "description": "Component or system this contributed through"
+    },
+    "timeline": {
+      "type": "object",
+      "description": "When this factor was introduced/active",
+      "properties": {
+        "introducedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When problem was introduced"
+        },
+        "becameActiveAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When it became a contributing factor"
+        },
+        "cumulativeDays": {
+          "type": "integer",
+          "description": "Days between introduction and discovery"
+        }
+      }
+    },
+    "controlFailure": {
+      "type": "object",
+      "description": "What control should have prevented this",
+      "properties": {
+        "controlName": {
+          "type": "string"
+        },
+        "controlType": {
+          "type": "string",
+          "enum": [
+            "preventive",
+            "detective",
+            "corrective"
+          ]
+        },
+        "whyFailed": {
+          "type": "string"
+        }
+      }
+    },
+    "mitigations": {
+      "type": "array",
+      "description": "Mitigations to prevent recurrence",
+      "items": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "code_change",
+              "process_change",
+              "control_addition",
+              "training",
+              "documentation",
+              "tooling",
+              "automation"
+            ]
+          },
+          "owner": {
+            "type": "string"
+          },
+          "targetDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "planned",
+              "in_progress",
+              "completed",
+              "blocked"
+            ]
+          }
+        }
+      }
+    },
+    "similarPatterns": {
+      "type": "array",
+      "description": "Other failures with similar contributing factors",
+      "items": {
+        "type": "string",
+        "pattern": "^fail_[a-zA-Z0-9_-]{8,}$"
+      }
+    },
+    "investigatedBy": {
+      "type": "string",
+      "description": "Person or team who investigated"
+    },
+    "investigationDate": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "confidence": {
+      "type": "string",
+      "enum": [
+        "certain",
+        "high",
+        "moderate",
+        "low"
+      ],
+      "description": "Confidence in this being a contributor"
+    },
+    "metadata": {
+      "type": "object"
+    }
+  }
+}
