@@ -3,24 +3,25 @@ import { SEVERITY_WEIGHTS } from './taxonomy';
 import { normalizeScore } from './utils';
 
 export function calculateImpactScore(report: FailureReport): number {
-  let score = SEVERITY_WEIGHTS[report.severity];
+  // Scale severity to leave room for domain/status bonuses
+  let score = SEVERITY_WEIGHTS[report.severity] * 0.7;
 
   if (report.domain === 'security') {
-    score += 25;
+    score += 20;
   }
   if (report.domain === 'agent-orchestration') {
-    score += 15;
+    score += 12;
   }
 
   if (report.verificationStatus !== 'resolved') {
-    score += 10;
+    score += 8;
   }
 
   if (report.recommendations && report.recommendations.length > 2) {
     score += 5;
   }
 
-  return normalizeScore(score);
+  return normalizeScore(Math.round(score));
 }
 
 export function calculateUrgencyScore(report: FailureReport): number {

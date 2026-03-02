@@ -21,3 +21,25 @@ export function getFailureCategory(type: FailureType): string {
 export function getSeverityWeight(severity: Severity): number {
   return SEVERITY_WEIGHTS[severity];
 }
+
+const DEFAULT_SEVERITY_MAP: Record<string, Severity> = {
+  'security.prompt_injection': 'high',
+  'security.unauthorized_access': 'high',
+  'execution.timeout': 'high',
+  'execution.out_of_memory': 'high',
+  'execution.crash': 'high',
+  'model.inference_error': 'medium',
+  'model.hallucination': 'medium',
+  'model.bias_detected': 'medium',
+  'logic.invalid_reasoning': 'medium',
+  'logic.circular_dependency': 'low',
+  'io.invalid_input': 'low',
+  'io.malformed_data': 'low',
+  'io.timeout': 'medium',
+  'integration.api_error': 'medium',
+  'integration.dependency_missing': 'low',
+};
+
+export function getDefaultSeverityForType(type: FailureType): Severity {
+  return DEFAULT_SEVERITY_MAP[type] || 'medium';
+}
