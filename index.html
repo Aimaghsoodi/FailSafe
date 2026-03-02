@@ -1,0 +1,3035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="FailSafe — AI Failure Intelligence Platform. Predict, detect, and recover from AI agent failures before they reach production. 150+ documented failure modes.">
+  <meta name="keywords" content="AI failures, AI reliability, AI agents, failure detection, LLM monitoring, AI safety">
+  <meta property="og:title" content="FailSafe — AI Failure Intelligence Platform">
+  <meta property="og:description" content="The comprehensive failure intelligence platform. Predict, detect, and recover from AI agent failures before they reach production.">
+  <meta property="og:type" content="website">
+  <title>FailSafe — AI Failure Intelligence Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       RESET & BASE
+       ============================================================ */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #030712;
+      color: #f8fafc;
+      line-height: 1.7;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Space Grotesk', sans-serif;
+      line-height: 1.2;
+      font-weight: 700;
+    }
+
+    code, pre, .mono {
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img, svg {
+      display: block;
+      max-width: 100%;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: inherit;
+    }
+
+    ul { list-style: none; }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .container-lg {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ============================================================
+       ANIMATED BACKGROUND — MESH GRID
+       ============================================================ */
+    .bg-mesh {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .bg-mesh canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    .bg-gradient-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.15;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .bg-gradient-orb.orb-1 {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, #ef4444, transparent 70%);
+      top: -200px;
+      right: -100px;
+      animation: orbFloat1 20s ease-in-out infinite;
+    }
+
+    .bg-gradient-orb.orb-2 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, #f97316, transparent 70%);
+      bottom: -150px;
+      left: -100px;
+      animation: orbFloat2 25s ease-in-out infinite;
+    }
+
+    .bg-gradient-orb.orb-3 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, #a855f7, transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: orbFloat3 30s ease-in-out infinite;
+    }
+
+    @keyframes orbFloat1 {
+      0%, 100% { transform: translate(0, 0); }
+      33% { transform: translate(-80px, 60px); }
+      66% { transform: translate(40px, -40px); }
+    }
+
+    @keyframes orbFloat2 {
+      0%, 100% { transform: translate(0, 0); }
+      33% { transform: translate(60px, -80px); }
+      66% { transform: translate(-40px, 40px); }
+    }
+
+    @keyframes orbFloat3 {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.3); }
+    }
+
+    /* ============================================================
+       FLOATING ALERT BADGES
+       ============================================================ */
+    .floating-alerts {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .alert-badge {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.15);
+      border-radius: 20px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: rgba(239, 68, 68, 0.4);
+      white-space: nowrap;
+      opacity: 0;
+      animation: alertFloat 12s ease-in-out infinite;
+    }
+
+    .alert-badge svg {
+      width: 12px;
+      height: 12px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+
+    .alert-badge:nth-child(1) { top: 15%; left: 5%; animation-delay: 0s; }
+    .alert-badge:nth-child(2) { top: 25%; right: 8%; animation-delay: 2s; }
+    .alert-badge:nth-child(3) { top: 45%; left: 3%; animation-delay: 4s; }
+    .alert-badge:nth-child(4) { top: 60%; right: 5%; animation-delay: 6s; }
+    .alert-badge:nth-child(5) { top: 75%; left: 8%; animation-delay: 8s; }
+    .alert-badge:nth-child(6) { top: 35%; right: 3%; animation-delay: 10s; }
+
+    @keyframes alertFloat {
+      0% { opacity: 0; transform: translateY(10px); }
+      10% { opacity: 1; transform: translateY(0); }
+      80% { opacity: 1; transform: translateY(-5px); }
+      100% { opacity: 0; transform: translateY(-15px); }
+    }
+
+    /* ============================================================
+       SCROLL REVEAL
+       ============================================================ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+    .reveal-delay-5 { transition-delay: 0.5s; }
+    .reveal-delay-6 { transition-delay: 0.6s; }
+    .reveal-delay-7 { transition-delay: 0.7s; }
+    .reveal-delay-8 { transition-delay: 0.8s; }
+
+    .reveal-left {
+      opacity: 0;
+      transform: translateX(-40px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal-left.revealed {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .reveal-right {
+      opacity: 0;
+      transform: translateX(40px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal-right.revealed {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* ============================================================
+       NAVIGATION
+       ============================================================ */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 16px 0;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .navbar.scrolled {
+      background: rgba(3, 7, 18, 0.85);
+      backdrop-filter: blur(20px) saturate(1.4);
+      -webkit-backdrop-filter: blur(20px) saturate(1.4);
+      border-bottom: 1px solid rgba(239, 68, 68, 0.08);
+      padding: 10px 0;
+    }
+
+    .navbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .navbar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 22px;
+      color: #f8fafc;
+      z-index: 1001;
+    }
+
+    .navbar-logo svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .navbar-links {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+    }
+
+    .navbar-links a {
+      font-size: 14px;
+      font-weight: 500;
+      color: #94a3b8;
+      transition: color 0.25s ease;
+      position: relative;
+    }
+
+    .navbar-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #ef4444, #f97316);
+      border-radius: 1px;
+      transition: width 0.3s ease;
+    }
+
+    .navbar-links a:hover {
+      color: #f8fafc;
+    }
+
+    .navbar-links a:hover::after {
+      width: 100%;
+    }
+
+    .navbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      z-index: 1001;
+    }
+
+    .btn-github {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #94a3b8;
+      transition: color 0.25s ease;
+    }
+
+    .btn-github:hover { color: #f8fafc; }
+
+    .btn-github svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .btn-cta-sm {
+      padding: 8px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      background: linear-gradient(135deg, #ef4444, #f97316);
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-cta-sm::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 200%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn-cta-sm:hover::before {
+      left: 100%;
+    }
+
+    .btn-cta-sm:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(239, 68, 68, 0.3);
+    }
+
+    /* Hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      z-index: 1001;
+      padding: 4px;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: #f8fafc;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger.active span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -5px);
+    }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(3, 7, 18, 0.98);
+      backdrop-filter: blur(20px);
+      z-index: 999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .mobile-menu.open {
+      display: flex;
+      opacity: 1;
+    }
+
+    .mobile-menu a {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 24px;
+      font-weight: 600;
+      color: #f8fafc;
+      transition: color 0.25s ease;
+    }
+
+    .mobile-menu a:hover {
+      color: #ef4444;
+    }
+
+    /* ============================================================
+       BUTTONS
+       ============================================================ */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      background: linear-gradient(135deg, #ef4444, #f97316);
+      border-radius: 12px;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 200%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .btn-primary:hover::before {
+      left: 100%;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(239, 68, 68, 0.35);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #f8fafc;
+      background: transparent;
+      border: 1px solid rgba(248, 250, 252, 0.2);
+      border-radius: 12px;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-outline:hover {
+      border-color: rgba(239, 68, 68, 0.5);
+      background: rgba(239, 68, 68, 0.05);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* ============================================================
+       EYEBROW / BADGES
+       ============================================================ */
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #ef4444;
+      margin-bottom: 16px;
+    }
+
+    .eyebrow::before {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: linear-gradient(90deg, #ef4444, #f97316);
+      border-radius: 1px;
+    }
+
+    .pill-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #f97316;
+      background: rgba(249, 115, 22, 0.08);
+      border: 1px solid rgba(249, 115, 22, 0.2);
+      border-radius: 100px;
+      margin-bottom: 24px;
+    }
+
+    .pill-badge .dot {
+      width: 6px;
+      height: 6px;
+      background: #f97316;
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    /* ============================================================
+       SECTION STYLING
+       ============================================================ */
+    section {
+      position: relative;
+      z-index: 2;
+    }
+
+    .section-divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.15), rgba(249, 115, 22, 0.15), transparent);
+    }
+
+    .section-title {
+      font-size: clamp(32px, 5vw, 48px);
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 20px;
+    }
+
+    .section-subtitle {
+      font-size: 18px;
+      color: #94a3b8;
+      max-width: 640px;
+      line-height: 1.7;
+    }
+
+    /* ============================================================
+       HERO
+       ============================================================ */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg-dots {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 900px;
+    }
+
+    .hero-title {
+      font-size: clamp(40px, 7vw, 80px);
+      font-weight: 700;
+      line-height: 1.05;
+      margin-bottom: 24px;
+    }
+
+    .hero-title .gradient-text {
+      background: linear-gradient(135deg, #ef4444, #f97316, #eab308);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(16px, 2.5vw, 20px);
+      color: #94a3b8;
+      max-width: 680px;
+      margin: 0 auto 32px;
+      line-height: 1.7;
+    }
+
+    .hero-typewriter {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 40px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(13px, 1.8vw, 16px);
+      color: #22c55e;
+      min-height: 28px;
+    }
+
+    .typewriter-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 20px;
+      background: #22c55e;
+      animation: blink 0.8s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    .hero-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 48px;
+      flex-wrap: wrap;
+    }
+
+    .hero-terminal {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 24px;
+      background: rgba(15, 10, 26, 0.8);
+      border: 1px solid rgba(239, 68, 68, 0.15);
+      border-radius: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: #94a3b8;
+    }
+
+    .hero-terminal .prompt {
+      color: #22c55e;
+    }
+
+    .hero-terminal code {
+      color: #f8fafc;
+    }
+
+    .hero-terminal .copy-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      color: #64748b;
+      transition: all 0.2s ease;
+    }
+
+    .hero-terminal .copy-btn:hover {
+      color: #f8fafc;
+      background: rgba(248, 250, 252, 0.1);
+    }
+
+    .hero-terminal .copy-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ============================================================
+       PROBLEM SECTION
+       ============================================================ */
+    .problem-section {
+      padding: 120px 0;
+      background: linear-gradient(180deg, #030712 0%, #0f0a1a 100%);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin: 48px 0;
+    }
+
+    .stat-card {
+      text-align: center;
+      padding: 32px 20px;
+      background: rgba(15, 10, 26, 0.6);
+      border: 1px solid rgba(239, 68, 68, 0.1);
+      border-radius: 16px;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .stat-card:hover {
+      border-color: rgba(239, 68, 68, 0.3);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 60px rgba(239, 68, 68, 0.08);
+    }
+
+    .stat-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 48px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ef4444, #f97316);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+
+    .problem-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 48px;
+    }
+
+    .problem-card {
+      padding: 32px;
+      background: rgba(15, 10, 26, 0.6);
+      border: 1px solid rgba(239, 68, 68, 0.1);
+      border-radius: 16px;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .problem-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #ef4444, #f97316);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .problem-card:hover::before { opacity: 1; }
+
+    .problem-card:hover {
+      border-color: rgba(239, 68, 68, 0.25);
+      transform: translateY(-4px);
+    }
+
+    .problem-card-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(239, 68, 68, 0.1);
+      border-radius: 12px;
+      margin-bottom: 20px;
+      color: #ef4444;
+    }
+
+    .problem-card-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .problem-card h3 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .problem-card p {
+      font-size: 15px;
+      color: #94a3b8;
+      line-height: 1.7;
+    }
+
+    /* ============================================================
+       SOLUTION SECTION
+       ============================================================ */
+    .solution-section {
+      padding: 120px 0;
+      background: #030712;
+    }
+
+    .solution-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin: 56px 0;
+      flex-wrap: wrap;
+    }
+
+    .flow-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 24px 28px;
+      background: rgba(15, 10, 26, 0.6);
+      border: 1px solid rgba(239, 68, 68, 0.1);
+      border-radius: 16px;
+      min-width: 160px;
+      text-align: center;
+      transition: all 0.4s ease;
+    }
+
+    .flow-step:hover {
+      border-color: rgba(239, 68, 68, 0.3);
+      transform: translateY(-4px);
+    }
+
+    .flow-step-icon {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      color: #fff;
+    }
+
+    .flow-step-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .flow-step-icon.icon-blue { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+    .flow-step-icon.icon-red { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+    .flow-step-icon.icon-amber { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+    .flow-step-icon.icon-green { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
+    .flow-step h4 {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .flow-step p {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .flow-arrow {
+      font-size: 24px;
+      color: rgba(239, 68, 68, 0.3);
+      padding: 0 8px;
+      flex-shrink: 0;
+    }
+
+    .flow-arrow svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .solution-pillars {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      margin-top: 48px;
+    }
+
+    .pillar-card {
+      padding: 36px;
+      background: rgba(15, 10, 26, 0.6);
+      border: 1px solid rgba(239, 68, 68, 0.1);
+      border-radius: 16px;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pillar-card:hover {
+      border-color: rgba(239, 68, 68, 0.25);
+      transform: translateY(-4px) perspective(800px) rotateX(1deg);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .pillar-icon {
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 14px;
+      margin-bottom: 20px;
+    }
+
+    .pillar-icon svg {
+      width: 26px;
+      height: 26px;
+    }
+
+    .pillar-icon.pi-red { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+    .pillar-icon.pi-orange { background: rgba(249, 115, 22, 0.1); color: #f97316; }
+    .pillar-icon.pi-amber { background: rgba(234, 179, 8, 0.1); color: #eab308; }
+    .pillar-icon.pi-purple { background: rgba(168, 85, 247, 0.1); color: #a855f7; }
+
+    .pillar-card h3 {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .pillar-card p {
+      font-size: 15px;
+      color: #94a3b8;
+      line-height: 1.7;
+    }
+
+    .pillar-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+      border-radius: 6px;
+      margin-top: 16px;
+    }
+
+    .pillar-badge.badge-red { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+    .pillar-badge.badge-orange { background: rgba(249, 115, 22, 0.1); color: #f97316; }
+    .pillar-badge.badge-amber { background: rgba(234, 179, 8, 0.1); color: #eab308; }
+    .pillar-badge.badge-purple { background: rgba(168, 85, 247, 0.1); color: #a855f7; }
+
+    /* ============================================================
+       TAXONOMY SECTION (interactive)
+       ============================================================ */
+    .taxonomy-section {
+      padding: 120px 0;
+      background: linear-gradient(180deg, #030712 0%, #0f0a1a 50%, #030712 100%);
+    }
+
+    .taxonomy-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 48px;
+    }
+
+    .taxonomy-card {
+      background: rgba(15, 10, 26, 0.6);
+      border: 1px solid rgba(239, 68, 68, 0.1);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.4s ease;
+      cursor: pointer;
+    }
+
+    .taxonomy-card:hover {
+      border-color: rgba(239, 68, 68, 0.25);
+    }
+
+    .taxonomy-card.expanded {
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    .taxonomy-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 28px;
+      user-select: none;
+    }
+
+    .taxonomy-header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .taxonomy-icon {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
+
+    .taxonomy-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .taxonomy-icon.ti-red { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+    .taxonomy-icon.ti-orange { background: rgba(249, 115, 22, 0.1); color: #f97316; }
+    .taxonomy-icon.ti-amber { background: rgba(234, 179, 8, 0.1); color: #eab308; }
+    .taxonomy-icon.ti-purple { background: rgba(168, 85, 247, 0.1); color: #a855f7; }
+    .taxonomy-icon.ti-blue { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+    .taxonomy-icon.ti-green { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+    .taxonomy-icon.ti-rose { background: rgba(244, 63, 94, 0.1); color: #f43f5e; }
+    .taxonomy-icon.ti-cyan { background: rgba(6, 182, 212, 0.1); color: #06b6d4; }
+
+    .taxonomy-info h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .taxonomy-info p {
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    .taxonomy-header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .taxonomy-count {
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border-radius: 6px;
+    }
+
+    .taxonomy-chevron {
+      width: 20px;
+      height: 20px;
+      color: #64748b;
+      transition: transform 0.3s ease;
+    }
+
+    .taxonomy-card.expanded .taxonomy-chevron {
+      transform: rotate(180deg);
+    }
+
+    .taxonomy-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .taxonomy-card.expanded .taxonomy-body {
+      max-height: 400px;
+    }
+
+    .taxonomy-body-inner {
+      padding: 0 28px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .taxonomy-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 16px;
+      background: rgba(3, 7, 18, 0.5);
+      border-radius: 10px;
+      font-size: 14px;
+      color: #cbd5e1;
+    }
+
+    .taxonomy-item-dot {
+      width: 6px;
+      height: 6px;
+      background: #ef4444;
+      border-radius: 50%;
+      margin-top: 7px;
+      flex-shrink: 0;
+    }
+
+    .taxonomy-item strong {
+      color: #f8fafc;
+      font-weight: 600;
+    }
+
+    /* ============================================================
+       HOW IT WORKS
+       ============================================================ */
+    .how-section {
+      padding: 120px 0;
+      background: #030712;
+    }
+
+    .steps-container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-top: 56px;
+      position: relative;
+    }
+
+    .steps-container::before {
+      content: '';
+      position: absolute;
+      top: 44px;
+      left: 12.5%;
+      right: 12.5%;
+      height: 2px;
+      background: linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e);
+      opacity: 0.2;
+      z-index: 0;
+    }
+
+    .step-item {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+
+    .step-number {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      margin: 0 auto 20px;
+      position: relative;
+    }
+
+    .step-number.sn-1 { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 2px solid rgba(239, 68, 68, 0.3); }
+    .step-number.sn-2 { background: rgba(249, 115, 22, 0.15); color: #f97316; border: 2px solid rgba(249, 115, 22, 0.3); }
+    .step-number.sn-3 { background: rgba(234, 179, 8, 0.15); color: #eab308; border: 2px solid rgba(234, 179, 8, 0.3); }
+    .step-number.sn-4 { background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 2px solid rgba(34, 197, 94, 0.3); }
+
+    .step-item h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .step-code {
+      background: rgba(15, 10, 26, 0.8);
+      border: 1px solid rgba(239, 68, 68, 0.1);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: left;
+      margin-top: 16px;
+    }
+
+    .step-code pre {
+      font-size: 12px;
+      line-height: 1.6;
+      color: #94a3b8;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .step-code .kw { color: #c084fc; }
+    .step-code .fn { color: #60a5fa; }
+    .step-code .str { color: #34d399; }
+    .step-code .cm { color: #4b5563; }
+    .step-code .op { color: #94a3b8; }
+    .step-code .var { color: #f8fafc; }
+
+    /* ============================================================
+       CODE INTEGRATION (tabbed)
+       ============================================================ */
+    .code-section {
+      padding: 120px 0;
+      background: linear-gradient(180deg, #030712 0%, #0f0a1a 100%);
+    }
+
+    .code-window {
+      background: rgba(15, 10, 26, 0.8);
+      border: 1px solid rgba(239, 68, 68, 0.1);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-top: 48px;
+    }
+
+    .code-tabs {
+      display: flex;
+      border-bottom: 1px solid rgba(239, 68, 68, 0.1);
+    }
+
+    .code-tab {
+      padding: 14px 28px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #64748b;
+      border-bottom: 2px solid transparent;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .code-tab:hover {
+      color: #94a3b8;
+    }
+
+    .code-tab.active {
+      color: #f8fafc;
+      border-bottom-color: #ef4444;
+    }
+
+    .code-panel {
+      display: none;
+      padding: 28px;
+      position: relative;
+    }
+
+    .code-panel.active {
+      display: block;
+    }
+
+    .code-panel pre {
+      font-size: 13px;
+      line-height: 1.7;
+      color: #94a3b8;
+      overflow-x: auto;
+    }
+
+    .code-panel .copy-code-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #64748b;
+      background: rgba(3, 7, 18, 0.6);
+      border: 1px solid rgba(248, 250, 252, 0.1);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .code-panel .copy-code-btn:hover {
+      color: #f8fafc;
+      border-color: rgba(248, 250, 252, 0.2);
+    }
+
+    .code-panel .copy-code-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* Syntax colors */
+    .code-panel .kw { color: #c084fc; }
+    .code-panel .fn { color: #60a5fa; }
+    .code-panel .str { color: #34d399; }
+    .code-panel .cm { color: #4b5563; }
+    .code-panel .num { color: #fb923c; }
+    .code-panel .var { color: #f8fafc; }
+    .code-panel .type { color: #f472b6; }
+    .code-panel .op { color: #94a3b8; }
+    .code-panel .dec { color: #fbbf24; }
+
+    /* ============================================================
+       DOMAIN SOLUTIONS
+       ============================================================ */
+    .domains-section {
+      padding: 120px 0;
+      background: #030712;
+    }
+
+    .domain-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 48px;
+    }
+
+    .domain-card {
+      padding: 32px;
+      background: rgba(15, 10, 26, 0.6);
+      border: 1px solid rgba(239, 68, 68, 0.1);
+      border-radius: 16px;
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      perspective: 800px;
+    }
+
+    .domain-card:hover {
+      border-color: rgba(239, 68, 68, 0.3);
+      box-shadow: 0 0 40px rgba(239, 68, 68, 0.06);
+    }
+
+    .domain-card-icon {
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 14px;
+      margin-bottom: 20px;
+    }
+
+    .domain-card-icon svg {
+      width: 26px;
+      height: 26px;
+    }
+
+    .domain-card-icon.di-rose { background: rgba(244, 63, 94, 0.1); color: #f43f5e; }
+    .domain-card-icon.di-blue { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+    .domain-card-icon.di-purple { background: rgba(168, 85, 247, 0.1); color: #a855f7; }
+    .domain-card-icon.di-amber { background: rgba(234, 179, 8, 0.1); color: #eab308; }
+    .domain-card-icon.di-green { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+    .domain-card-icon.di-orange { background: rgba(249, 115, 22, 0.1); color: #f97316; }
+
+    .domain-card h3 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .domain-card p {
+      font-size: 14px;
+      color: #94a3b8;
+      line-height: 1.7;
+    }
+
+    /* ============================================================
+       FEATURES GRID
+       ============================================================ */
+    .features-section {
+      padding: 120px 0;
+      background: linear-gradient(180deg, #030712 0%, #0f0a1a 100%);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-top: 48px;
+    }
+
+    .feature-card {
+      padding: 28px 24px;
+      background: rgba(15, 10, 26, 0.6);
+      border: 1px solid rgba(239, 68, 68, 0.08);
+      border-radius: 14px;
+      text-align: center;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .feature-card:hover {
+      border-color: rgba(239, 68, 68, 0.25);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+    }
+
+    .feature-card-icon {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      margin: 0 auto 16px;
+      background: rgba(239, 68, 68, 0.08);
+      color: #ef4444;
+    }
+
+    .feature-card-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .feature-card h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .feature-card p {
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    /* ============================================================
+       CTA SECTION
+       ============================================================ */
+    .cta-section {
+      padding: 120px 0;
+      background: #030712;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 800px;
+      height: 800px;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(239, 68, 68, 0.06), transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta-title {
+      font-size: clamp(36px, 5vw, 56px);
+      font-weight: 700;
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .cta-subtitle {
+      font-size: 18px;
+      color: #94a3b8;
+      margin-bottom: 40px;
+      position: relative;
+    }
+
+    .cta-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 48px;
+      flex-wrap: wrap;
+      position: relative;
+    }
+
+    .cta-terminal {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 24px;
+      background: rgba(15, 10, 26, 0.8);
+      border: 1px solid rgba(239, 68, 68, 0.15);
+      border-radius: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: #94a3b8;
+      position: relative;
+    }
+
+    .cta-terminal .prompt { color: #22c55e; }
+    .cta-terminal code { color: #f8fafc; }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    .site-footer {
+      padding: 64px 0 32px;
+      background: #030712;
+      border-top: 1px solid rgba(239, 68, 68, 0.06);
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr repeat(4, 1fr);
+      gap: 48px;
+      margin-bottom: 48px;
+    }
+
+    .footer-brand p {
+      font-size: 14px;
+      color: #64748b;
+      margin-top: 12px;
+      line-height: 1.7;
+      max-width: 280px;
+    }
+
+    .footer-col h4 {
+      font-size: 13px;
+      font-weight: 600;
+      color: #f8fafc;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+
+    .footer-col ul {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .footer-col a {
+      font-size: 14px;
+      color: #64748b;
+      transition: color 0.2s ease;
+    }
+
+    .footer-col a:hover { color: #f8fafc; }
+
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 32px;
+      border-top: 1px solid rgba(248, 250, 252, 0.06);
+    }
+
+    .footer-bottom p {
+      font-size: 13px;
+      color: #475569;
+    }
+
+    .footer-bottom-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-bottom-links a {
+      font-size: 13px;
+      color: #475569;
+      transition: color 0.2s ease;
+    }
+
+    .footer-bottom-links a:hover { color: #94a3b8; }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 1024px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .solution-pillars { grid-template-columns: 1fr; }
+      .taxonomy-grid { grid-template-columns: 1fr; }
+      .steps-container {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .steps-container::before { display: none; }
+      .domain-grid { grid-template-columns: repeat(2, 1fr); }
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+    }
+
+    @media (max-width: 768px) {
+      .navbar-links { display: none; }
+      .hamburger { display: flex; }
+      .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .stat-value { font-size: 36px; }
+      .problem-cards { grid-template-columns: 1fr; }
+      .solution-flow { flex-direction: column; gap: 8px; }
+      .flow-arrow { transform: rotate(90deg); }
+      .steps-container { grid-template-columns: 1fr; gap: 32px; }
+      .domain-grid { grid-template-columns: 1fr; }
+      .features-grid { grid-template-columns: 1fr 1fr; }
+      .hero-buttons { flex-direction: column; }
+      .hero-terminal { width: 100%; justify-content: center; }
+      .cta-buttons { flex-direction: column; }
+      .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+      .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+    }
+
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .features-grid { grid-template-columns: 1fr; }
+      .hero-title { font-size: 36px; }
+    }
+
+    /* ============================================================
+       3D CARD TILT (applied via JS)
+       ============================================================ */
+    .tilt-card {
+      transition: transform 0.15s ease-out;
+    }
+
+    /* ============================================================
+       COPY FEEDBACK
+       ============================================================ */
+    .copy-feedback {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      padding: 12px 20px;
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      border-radius: 10px;
+      color: #22c55e;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 9999;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+
+    .copy-feedback.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       BACKGROUND ELEMENTS
+       ============================================================ -->
+  <div class="bg-mesh">
+    <canvas id="meshCanvas"></canvas>
+  </div>
+  <div class="bg-gradient-orb orb-1"></div>
+  <div class="bg-gradient-orb orb-2"></div>
+  <div class="bg-gradient-orb orb-3"></div>
+
+  <div class="floating-alerts">
+    <div class="alert-badge">
+      <svg viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+      Hallucination detected
+    </div>
+    <div class="alert-badge">
+      <svg viewBox="0 0 24 24"><path d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+      Safety boundary enforced
+    </div>
+    <div class="alert-badge">
+      <svg viewBox="0 0 24 24"><path d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z"/></svg>
+      Recovery executing
+    </div>
+    <div class="alert-badge">
+      <svg viewBox="0 0 24 24"><path d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
+      Cascade failure blocked
+    </div>
+    <div class="alert-badge">
+      <svg viewBox="0 0 24 24"><path d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/></svg>
+      Data integrity verified
+    </div>
+    <div class="alert-badge">
+      <svg viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+      Agent validated
+    </div>
+  </div>
+
+  <!-- ============================================================
+       NAVIGATION
+       ============================================================ -->
+  <nav class="navbar" id="navbar">
+    <div class="navbar-inner">
+      <a href="#" class="navbar-logo">
+        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 3L4 9v14l12 6 12-6V9L16 3z" fill="rgba(239,68,68,0.1)" stroke="#ef4444"/>
+          <path d="M16 11l-6 3v6l6 3 6-3v-6l-6-3z" fill="rgba(239,68,68,0.2)" stroke="#ef4444"/>
+          <path d="M16 11v9" stroke="#ef4444" opacity="0.5"/>
+        </svg>
+        FailSafe
+      </a>
+
+      <div class="navbar-links" id="navLinks">
+        <a href="#platform">Platform</a>
+        <a href="#taxonomy">Failure Modes</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#pricing">Pricing</a>
+      </div>
+
+      <div class="navbar-actions">
+        <a href="https://github.com" class="btn-github" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          GitHub
+        </a>
+        <a href="#pricing" class="btn-cta-sm">Start Free</a>
+      </div>
+
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#platform" onclick="closeMobileMenu()">Platform</a>
+    <a href="#taxonomy" onclick="closeMobileMenu()">Failure Modes</a>
+    <a href="#how-it-works" onclick="closeMobileMenu()">How It Works</a>
+    <a href="#pricing" onclick="closeMobileMenu()">Pricing</a>
+    <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+    <a href="#pricing" class="btn-primary" onclick="closeMobileMenu()">Start Free</a>
+  </div>
+
+  <!-- ============================================================
+       HERO
+       ============================================================ -->
+  <section class="hero" id="hero">
+    <canvas class="hero-bg-dots" id="heroDots"></canvas>
+    <div class="hero-content">
+      <div class="pill-badge reveal">
+        <span class="dot"></span>
+        AI Reliability Platform &middot; 150+ Failure Modes
+      </div>
+
+      <h1 class="hero-title reveal reveal-delay-1">
+        AI Agents Fail.<br>
+        <span class="gradient-text">We Catch It.</span>
+      </h1>
+
+      <p class="hero-subtitle reveal reveal-delay-2">
+        The comprehensive failure intelligence platform. Predict, detect, and recover from AI agent failures before they reach production.
+      </p>
+
+      <div class="hero-typewriter reveal reveal-delay-3">
+        <span id="typewriterText"></span><span class="typewriter-cursor"></span>
+      </div>
+
+      <div class="hero-buttons reveal reveal-delay-4">
+        <a href="#platform" class="btn-primary">
+          Explore Platform
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#how-it-works" class="btn-outline">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6M9 16h6M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          View Documentation
+        </a>
+      </div>
+
+      <div class="hero-terminal reveal reveal-delay-5">
+        <span class="prompt">$</span>
+        <code>pip install failsafe</code>
+        <button class="copy-btn" onclick="copyToClipboard('pip install failsafe')" aria-label="Copy command">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ============================================================
+       PROBLEM SECTION
+       ============================================================ -->
+  <section class="problem-section" id="platform">
+    <div class="container">
+      <div class="eyebrow reveal">The Problem</div>
+      <h2 class="section-title reveal reveal-delay-1">AI Failures Are Invisible<br>Until They're Catastrophic</h2>
+      <p class="section-subtitle reveal reveal-delay-2">
+        Your AI agents are running in production right now. When they fail, most teams don't find out until the damage is done.
+      </p>
+
+      <div class="stats-grid">
+        <div class="stat-card reveal reveal-delay-1">
+          <div class="stat-value" data-target="73" data-suffix="%">0%</div>
+          <div class="stat-label">of AI deployments experience silent failures in the first 90 days</div>
+        </div>
+        <div class="stat-card reveal reveal-delay-2">
+          <div class="stat-value" data-target="4.2" data-suffix="x" data-decimals="1">0x</div>
+          <div class="stat-label">cascade multiplier &mdash; one failure triggers chain reactions</div>
+        </div>
+        <div class="stat-card reveal reveal-delay-3">
+          <div class="stat-value" data-target="89" data-suffix="%">0%</div>
+          <div class="stat-label">of engineering teams lack formal AI failure taxonomies</div>
+        </div>
+        <div class="stat-card reveal reveal-delay-4">
+          <div class="stat-value" data-target="2.1" data-prefix="$" data-suffix="M" data-decimals="1">$0M</div>
+          <div class="stat-label">average cost of undetected AI failures per enterprise per year</div>
+        </div>
+      </div>
+
+      <div class="problem-cards">
+        <div class="problem-card reveal reveal-delay-2 tilt-card">
+          <div class="problem-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+          </div>
+          <h3>Silent Hallucinations</h3>
+          <p>Your customer-facing AI confidently cites a nonexistent return policy. By the time support flags it, 2,000 customers have received false information and your brand trust is eroding.</p>
+        </div>
+        <div class="problem-card reveal reveal-delay-3 tilt-card">
+          <div class="problem-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
+          </div>
+          <h3>Cascade Failures</h3>
+          <p>An API timeout in one agent triggers a retry storm. The retry storm overwhelms your rate limits. Downstream agents get stale data. One failure becomes twenty in under sixty seconds.</p>
+        </div>
+        <div class="problem-card reveal reveal-delay-4 tilt-card">
+          <div class="problem-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+          </div>
+          <h3>Safety Boundary Breaches</h3>
+          <p>A code-generation agent with access to your production database starts executing write operations it was never authorized to perform. No guardrails. No alerts. No audit trail.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ============================================================
+       SOLUTION SECTION
+       ============================================================ -->
+  <section class="solution-section" id="solution">
+    <div class="container">
+      <div class="eyebrow reveal">The Solution</div>
+      <h2 class="section-title reveal reveal-delay-1">Complete Failure Intelligence</h2>
+      <p class="section-subtitle reveal reveal-delay-2">
+        FailSafe gives you full-spectrum visibility into how your AI agents fail, why they fail, and how to recover automatically.
+      </p>
+
+      <div class="solution-flow reveal reveal-delay-3">
+        <div class="flow-step">
+          <div class="flow-step-icon icon-blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.58-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/></svg>
+          </div>
+          <h4>Agent Action</h4>
+          <p>Any AI operation</p>
+        </div>
+
+        <div class="flow-arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+
+        <div class="flow-step">
+          <div class="flow-step-icon icon-red">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3L4 9v14l12 6 12-6V9L16 3z" transform="scale(0.75) translate(4,4)"/><path d="M12 9v3.75m0 3h.008"/></svg>
+          </div>
+          <h4>FailSafe Monitor</h4>
+          <p>Real-time analysis</p>
+        </div>
+
+        <div class="flow-arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+
+        <div class="flow-step">
+          <div class="flow-step-icon icon-amber">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+          </div>
+          <h4>Detection</h4>
+          <p>Classify failure</p>
+        </div>
+
+        <div class="flow-arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+
+        <div class="flow-step">
+          <div class="flow-step-icon icon-green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <h4>Recovery</h4>
+          <p>Auto-remediate</p>
+        </div>
+      </div>
+
+      <div class="solution-pillars">
+        <div class="pillar-card reveal reveal-delay-1 tilt-card">
+          <div class="pillar-icon pi-red">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z"/></svg>
+          </div>
+          <h3>Comprehensive Taxonomy</h3>
+          <p>Over 150 documented failure modes across 8 categories. Each failure mode includes detection heuristics, prevention strategies, recovery procedures, and real-world examples. Built from production incident data, not theory.</p>
+          <span class="pillar-badge badge-red">150+ failure modes</span>
+        </div>
+
+        <div class="pillar-card reveal reveal-delay-2 tilt-card">
+          <div class="pillar-icon pi-orange">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
+          </div>
+          <h3>Real-time Detection</h3>
+          <p>Lightweight monitors that run alongside your agents. Detect hallucinations, safety violations, cascade failures, and behavioral drift in milliseconds. Sub-1ms overhead per operation. Zero impact on agent performance.</p>
+          <span class="pillar-badge badge-orange">&lt;1ms latency</span>
+        </div>
+
+        <div class="pillar-card reveal reveal-delay-3 tilt-card">
+          <div class="pillar-icon pi-amber">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
+          </div>
+          <h3>Automated Recovery</h3>
+          <p>Define recovery strategies for every failure mode. Retry with backoff, fallback to safe defaults, circuit-break cascading failures, or escalate to human operators. Recovery executes in under 300 milliseconds.</p>
+          <span class="pillar-badge badge-amber">Auto-remediation</span>
+        </div>
+
+        <div class="pillar-card reveal reveal-delay-4 tilt-card">
+          <div class="pillar-icon pi-purple">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15a2.25 2.25 0 012.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"/></svg>
+          </div>
+          <h3>Audit and Compliance</h3>
+          <p>Every failure event logged with full context: what failed, when, why, and what recovery action was taken. Exportable audit trails for SOC 2, HIPAA, and ISO 27001 compliance requirements.</p>
+          <span class="pillar-badge badge-purple">SOC 2 ready</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ============================================================
+       TAXONOMY SECTION (interactive)
+       ============================================================ -->
+  <section class="taxonomy-section" id="taxonomy">
+    <div class="container">
+      <div class="eyebrow reveal">Failure Taxonomy</div>
+      <h2 class="section-title reveal reveal-delay-1">Every Failure Mode, Documented</h2>
+      <p class="section-subtitle reveal reveal-delay-2">
+        A structured, machine-readable classification of every way AI agents can fail. Click any category to explore specific failure modes.
+      </p>
+
+      <div class="taxonomy-grid">
+        <!-- 1. Hallucination -->
+        <div class="taxonomy-card reveal reveal-delay-1" onclick="toggleTaxonomy(this)">
+          <div class="taxonomy-header">
+            <div class="taxonomy-header-left">
+              <div class="taxonomy-icon ti-red">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              </div>
+              <div class="taxonomy-info">
+                <h3>Hallucination Failures</h3>
+                <p>False assertions, fabricated data</p>
+              </div>
+            </div>
+            <div class="taxonomy-header-right">
+              <span class="taxonomy-count">24 modes</span>
+              <svg class="taxonomy-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
+            </div>
+          </div>
+          <div class="taxonomy-body">
+            <div class="taxonomy-body-inner">
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>Confident False Claims</strong> &mdash; Agent states fabricated facts with high confidence scores, often citing nonexistent sources or statistics</div></div>
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>Fabricated References</strong> &mdash; Generation of URLs, paper titles, case law, or API endpoints that do not exist in reality</div></div>
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>Impossible Assertions</strong> &mdash; Logically or physically impossible claims presented as factual, such as contradictory dates or impossible metrics</div></div>
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>Entity Confusion</strong> &mdash; Conflating attributes of distinct entities, mixing up people, companies, products, or events</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Execution -->
+        <div class="taxonomy-card reveal reveal-delay-2" onclick="toggleTaxonomy(this)">
+          <div class="taxonomy-header">
+            <div class="taxonomy-header-left">
+              <div class="taxonomy-icon ti-orange">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z"/></svg>
+              </div>
+              <div class="taxonomy-info">
+                <h3>Execution Failures</h3>
+                <p>Timeouts, loops, resource exhaustion</p>
+              </div>
+            </div>
+            <div class="taxonomy-header-right">
+              <span class="taxonomy-count">21 modes</span>
+              <svg class="taxonomy-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
+            </div>
+          </div>
+          <div class="taxonomy-body">
+            <div class="taxonomy-body-inner">
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>Operation Timeouts</strong> &mdash; Agent operations exceeding configured time limits, causing downstream request failures and stale state</div></div>
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>Memory Exhaustion</strong> &mdash; Unbounded context accumulation or large payload processing consuming all available memory</div></div>
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>Infinite Loops</strong> &mdash; Agent enters a cyclic reasoning pattern, repeatedly attempting the same failed action without progress</div></div>
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>Deadlocks</strong> &mdash; Two or more agents waiting on each other's output, creating circular dependencies with no resolution path</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Integration -->
+        <div class="taxonomy-card reveal reveal-delay-3" onclick="toggleTaxonomy(this)">
+          <div class="taxonomy-header">
+            <div class="taxonomy-header-left">
+              <div class="taxonomy-icon ti-amber">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.928-1.532a4.5 4.5 0 00-1.242-7.244l-4.5-4.5a4.5 4.5 0 00-6.364 6.364L4.25 8.355" transform="translate(2,2) scale(0.85)"/></svg>
+              </div>
+              <div class="taxonomy-info">
+                <h3>Integration Failures</h3>
+                <p>APIs, auth, network partitions</p>
+              </div>
+            </div>
+            <div class="taxonomy-header-right">
+              <span class="taxonomy-count">19 modes</span>
+              <svg class="taxonomy-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
+            </div>
+          </div>
+          <div class="taxonomy-body">
+            <div class="taxonomy-body-inner">
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>API Contract Violations</strong> &mdash; External service changes response format or removes fields without notice, breaking agent parsing logic</div></div>
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>Authentication Expiry</strong> &mdash; OAuth tokens or API keys expire mid-workflow, causing cascading permission denied errors</div></div>
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>Rate Limit Saturation</strong> &mdash; Burst traffic exceeds provider rate limits, triggering 429 responses and degraded throughput</div></div>
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>Network Partitions</strong> &mdash; Temporary connectivity loss between agent and dependencies, leading to partial state updates and inconsistency</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Safety -->
+        <div class="taxonomy-card reveal reveal-delay-4" onclick="toggleTaxonomy(this)">
+          <div class="taxonomy-header">
+            <div class="taxonomy-header-left">
+              <div class="taxonomy-icon ti-rose">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+              </div>
+              <div class="taxonomy-info">
+                <h3>Safety Violations</h3>
+                <p>Boundary breaches, unauthorized access</p>
+              </div>
+            </div>
+            <div class="taxonomy-header-right">
+              <span class="taxonomy-count">18 modes</span>
+              <svg class="taxonomy-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
+            </div>
+          </div>
+          <div class="taxonomy-body">
+            <div class="taxonomy-body-inner">
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>Boundary Breaches</strong> &mdash; Agent exceeds its authorized scope, accessing resources or performing actions outside its permission set</div></div>
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>Data Exposure</strong> &mdash; Sensitive PII, credentials, or proprietary data leaked through agent outputs or logs</div></div>
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>Unauthorized Escalation</strong> &mdash; Agent gains elevated privileges through prompt injection, tool misuse, or permission chaining</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Behavioral Drift -->
+        <div class="taxonomy-card reveal reveal-delay-5" onclick="toggleTaxonomy(this)">
+          <div class="taxonomy-header">
+            <div class="taxonomy-header-left">
+              <div class="taxonomy-icon ti-purple">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"/></svg>
+              </div>
+              <div class="taxonomy-info">
+                <h3>Behavioral Drift</h3>
+                <p>Gradual degradation, reward hacking</p>
+              </div>
+            </div>
+            <div class="taxonomy-header-right">
+              <span class="taxonomy-count">16 modes</span>
+              <svg class="taxonomy-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
+            </div>
+          </div>
+          <div class="taxonomy-body">
+            <div class="taxonomy-body-inner">
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>Gradual Degradation</strong> &mdash; Output quality slowly declines over time as context accumulates or model behavior shifts between versions</div></div>
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>Reward Hacking</strong> &mdash; Agent optimizes for measurable metrics while violating the spirit of the task, gaming evaluation criteria</div></div>
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>Specification Gaming</strong> &mdash; Finding and exploiting loopholes in task instructions to produce technically compliant but useless outputs</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Knowledge -->
+        <div class="taxonomy-card reveal reveal-delay-6" onclick="toggleTaxonomy(this)">
+          <div class="taxonomy-header">
+            <div class="taxonomy-header-left">
+              <div class="taxonomy-icon ti-blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
+              </div>
+              <div class="taxonomy-info">
+                <h3>Knowledge Failures</h3>
+                <p>Outdated info, wrong tool selection</p>
+              </div>
+            </div>
+            <div class="taxonomy-header-right">
+              <span class="taxonomy-count">22 modes</span>
+              <svg class="taxonomy-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
+            </div>
+          </div>
+          <div class="taxonomy-body">
+            <div class="taxonomy-body-inner">
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>Stale Information</strong> &mdash; Agent relies on outdated training data for time-sensitive decisions like pricing, regulations, or API versions</div></div>
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>Wrong Tool Selection</strong> &mdash; Agent chooses a suboptimal or incorrect tool for the task, wasting tokens and producing poor results</div></div>
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>Context Window Overflow</strong> &mdash; Critical information pushed out of the context window mid-task, causing partial amnesia and inconsistent behavior</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7. Data Integrity -->
+        <div class="taxonomy-card reveal reveal-delay-7" onclick="toggleTaxonomy(this)">
+          <div class="taxonomy-header">
+            <div class="taxonomy-header-left">
+              <div class="taxonomy-icon ti-green">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125"/></svg>
+              </div>
+              <div class="taxonomy-info">
+                <h3>Data Integrity</h3>
+                <p>Corruption, race conditions, state</p>
+              </div>
+            </div>
+            <div class="taxonomy-header-right">
+              <span class="taxonomy-count">17 modes</span>
+              <svg class="taxonomy-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
+            </div>
+          </div>
+          <div class="taxonomy-body">
+            <div class="taxonomy-body-inner">
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>State Corruption</strong> &mdash; Concurrent agent operations modify shared state without proper locking, producing inconsistent data</div></div>
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>Race Conditions</strong> &mdash; Multiple agents reading and writing the same resource simultaneously, leading to lost updates or dirty reads</div></div>
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>Inconsistent Mutations</strong> &mdash; Partial writes succeed while others fail, leaving data in a half-updated, irrecoverable state</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 8. Quality Degradation -->
+        <div class="taxonomy-card reveal reveal-delay-8" onclick="toggleTaxonomy(this)">
+          <div class="taxonomy-header">
+            <div class="taxonomy-header-left">
+              <div class="taxonomy-icon ti-cyan">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+              </div>
+              <div class="taxonomy-info">
+                <h3>Quality Degradation</h3>
+                <p>Output decline, latency, error growth</p>
+              </div>
+            </div>
+            <div class="taxonomy-header-right">
+              <span class="taxonomy-count">15 modes</span>
+              <svg class="taxonomy-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
+            </div>
+          </div>
+          <div class="taxonomy-body">
+            <div class="taxonomy-body-inner">
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>Output Quality Decline</strong> &mdash; Responses become shorter, less detailed, or more generic over successive interactions within a session</div></div>
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>Latency Creep</strong> &mdash; Response times gradually increase as conversation context grows, eventually hitting timeout thresholds</div></div>
+              <div class="taxonomy-item"><span class="taxonomy-item-dot"></span><div><strong>Error Rate Growth</strong> &mdash; Proportion of failed operations increases over time due to accumulated state corruption or resource depletion</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ============================================================
+       HOW IT WORKS
+       ============================================================ -->
+  <section class="how-section" id="how-it-works">
+    <div class="container">
+      <div class="eyebrow reveal">How It Works</div>
+      <h2 class="section-title reveal reveal-delay-1">Four Steps to Reliable AI</h2>
+      <p class="section-subtitle reveal reveal-delay-2">
+        Go from zero failure coverage to full observability in under ten minutes. No infrastructure changes required.
+      </p>
+
+      <div class="steps-container">
+        <div class="step-item reveal reveal-delay-1">
+          <div class="step-number sn-1">1</div>
+          <h3>Install</h3>
+          <div class="step-code">
+            <pre><span class="cm"># Install the SDK</span>
+<span class="var">$</span> <span class="fn">pip install</span> <span class="str">failsafe</span>
+
+<span class="cm"># Or use npm</span>
+<span class="var">$</span> <span class="fn">npm install</span> <span class="str">@failsafe/core</span></pre>
+          </div>
+        </div>
+
+        <div class="step-item reveal reveal-delay-2">
+          <div class="step-number sn-2">2</div>
+          <h3>Configure</h3>
+          <div class="step-code">
+            <pre><span class="cm"># failsafe.yaml</span>
+<span class="var">monitors</span><span class="op">:</span>
+  <span class="op">-</span> <span class="str">hallucination</span>
+  <span class="op">-</span> <span class="str">safety_violation</span>
+  <span class="op">-</span> <span class="str">cascade_failure</span>
+  <span class="op">-</span> <span class="str">behavioral_drift</span>
+<span class="var">recovery</span><span class="op">:</span> <span class="str">auto</span></pre>
+          </div>
+        </div>
+
+        <div class="step-item reveal reveal-delay-3">
+          <div class="step-number sn-3">3</div>
+          <h3>Monitor</h3>
+          <div class="step-code">
+            <pre><span class="kw">from</span> <span class="var">failsafe</span> <span class="kw">import</span> <span class="fn">Monitor</span>
+
+<span class="var">monitor</span> <span class="op">=</span> <span class="fn">Monitor</span><span class="op">(</span>
+  <span class="var">config</span><span class="op">=</span><span class="str">"failsafe.yaml"</span>
+<span class="op">)</span>
+<span class="var">monitor</span><span class="op">.</span><span class="fn">start</span><span class="op">()</span></pre>
+          </div>
+        </div>
+
+        <div class="step-item reveal reveal-delay-4">
+          <div class="step-number sn-4">4</div>
+          <h3>Recover</h3>
+          <div class="step-code">
+            <pre><span class="dec">@monitor.on_failure</span>
+<span class="kw">def</span> <span class="fn">handle</span><span class="op">(</span><span class="var">event</span><span class="op">):</span>
+  <span class="kw">if</span> <span class="var">event</span><span class="op">.</span><span class="var">recoverable</span><span class="op">:</span>
+    <span class="var">event</span><span class="op">.</span><span class="fn">auto_recover</span><span class="op">()</span>
+  <span class="kw">else</span><span class="op">:</span>
+    <span class="var">event</span><span class="op">.</span><span class="fn">escalate</span><span class="op">()</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ============================================================
+       CODE INTEGRATION (tabbed)
+       ============================================================ -->
+  <section class="code-section" id="integration">
+    <div class="container">
+      <div class="eyebrow reveal">Integration</div>
+      <h2 class="section-title reveal reveal-delay-1">Drop-in SDKs for Every Stack</h2>
+      <p class="section-subtitle reveal reveal-delay-2">
+        Native libraries for Python and TypeScript. REST API for everything else. Production-ready in minutes.
+      </p>
+
+      <div class="code-window reveal reveal-delay-3">
+        <div class="code-tabs">
+          <button class="code-tab active" onclick="switchTab(this, 'panel-python')">Python</button>
+          <button class="code-tab" onclick="switchTab(this, 'panel-typescript')">TypeScript</button>
+          <button class="code-tab" onclick="switchTab(this, 'panel-rest')">REST API</button>
+        </div>
+
+        <div class="code-panel active" id="panel-python">
+          <button class="copy-code-btn" onclick="copyCodeBlock('panel-python')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copy
+          </button>
+          <pre><span class="kw">from</span> <span class="var">failsafe</span> <span class="kw">import</span> <span class="fn">FailSafe</span><span class="op">,</span> <span class="fn">Monitor</span><span class="op">,</span> <span class="fn">RecoveryStrategy</span>
+
+<span class="cm"># Initialize FailSafe with your configuration</span>
+<span class="var">fs</span> <span class="op">=</span> <span class="fn">FailSafe</span><span class="op">(</span>
+    <span class="var">monitors</span><span class="op">=[</span>
+        <span class="fn">Monitor</span><span class="op">.</span><span class="var">HALLUCINATION</span><span class="op">,</span>
+        <span class="fn">Monitor</span><span class="op">.</span><span class="var">SAFETY_VIOLATION</span><span class="op">,</span>
+        <span class="fn">Monitor</span><span class="op">.</span><span class="var">CASCADE_FAILURE</span><span class="op">,</span>
+        <span class="fn">Monitor</span><span class="op">.</span><span class="var">BEHAVIORAL_DRIFT</span><span class="op">,</span>
+    <span class="op">],</span>
+    <span class="var">recovery</span><span class="op">=</span><span class="fn">RecoveryStrategy</span><span class="op">.</span><span class="var">AUTO</span><span class="op">,</span>
+    <span class="var">audit_log</span><span class="op">=</span><span class="str">"./logs/failsafe.jsonl"</span><span class="op">,</span>
+<span class="op">)</span>
+
+<span class="cm"># Wrap your agent with FailSafe monitoring</span>
+<span class="dec">@fs.monitor</span>
+<span class="kw">async def</span> <span class="fn">run_agent</span><span class="op">(</span><span class="var">query</span><span class="op">:</span> <span class="type">str</span><span class="op">) -></span> <span class="type">str</span><span class="op">:</span>
+    <span class="var">response</span> <span class="op">=</span> <span class="kw">await</span> <span class="var">llm</span><span class="op">.</span><span class="fn">generate</span><span class="op">(</span><span class="var">query</span><span class="op">)</span>
+    <span class="kw">return</span> <span class="var">response</span>
+
+<span class="cm"># Register custom recovery handlers</span>
+<span class="dec">@fs.on_failure</span><span class="op">(</span><span class="str">"hallucination"</span><span class="op">)</span>
+<span class="kw">async def</span> <span class="fn">handle_hallucination</span><span class="op">(</span><span class="var">event</span><span class="op">):</span>
+    <span class="cm"># Re-run with stricter temperature and grounding</span>
+    <span class="kw">return await</span> <span class="var">llm</span><span class="op">.</span><span class="fn">generate</span><span class="op">(</span>
+        <span class="var">event</span><span class="op">.</span><span class="var">original_query</span><span class="op">,</span>
+        <span class="var">temperature</span><span class="op">=</span><span class="num">0.1</span><span class="op">,</span>
+        <span class="var">grounding</span><span class="op">=</span><span class="kw">True</span><span class="op">,</span>
+    <span class="op">)</span>
+
+<span class="cm"># Access failure analytics</span>
+<span class="var">report</span> <span class="op">=</span> <span class="var">fs</span><span class="op">.</span><span class="fn">get_report</span><span class="op">(</span><span class="var">last_hours</span><span class="op">=</span><span class="num">24</span><span class="op">)</span>
+<span class="fn">print</span><span class="op">(</span><span class="kw">f</span><span class="str">"Failures detected: </span><span class="op">{</span><span class="var">report</span><span class="op">.</span><span class="var">total_failures</span><span class="op">}</span><span class="str">"</span><span class="op">)</span>
+<span class="fn">print</span><span class="op">(</span><span class="kw">f</span><span class="str">"Auto-recovered:    </span><span class="op">{</span><span class="var">report</span><span class="op">.</span><span class="var">auto_recovered</span><span class="op">}</span><span class="str">"</span><span class="op">)</span>
+<span class="fn">print</span><span class="op">(</span><span class="kw">f</span><span class="str">"Escalated:         </span><span class="op">{</span><span class="var">report</span><span class="op">.</span><span class="var">escalated</span><span class="op">}</span><span class="str">"</span><span class="op">)</span></pre>
+        </div>
+
+        <div class="code-panel" id="panel-typescript">
+          <button class="copy-code-btn" onclick="copyCodeBlock('panel-typescript')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copy
+          </button>
+          <pre><span class="kw">import</span> <span class="op">{</span> <span class="fn">FailSafe</span><span class="op">,</span> <span class="fn">Monitor</span><span class="op">,</span> <span class="fn">RecoveryStrategy</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">'@failsafe/core'</span><span class="op">;</span>
+
+<span class="cm">// Initialize FailSafe with typed configuration</span>
+<span class="kw">const</span> <span class="var">fs</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">FailSafe</span><span class="op">({</span>
+  <span class="var">monitors</span><span class="op">: [</span>
+    <span class="fn">Monitor</span><span class="op">.</span><span class="var">HALLUCINATION</span><span class="op">,</span>
+    <span class="fn">Monitor</span><span class="op">.</span><span class="var">SAFETY_VIOLATION</span><span class="op">,</span>
+    <span class="fn">Monitor</span><span class="op">.</span><span class="var">CASCADE_FAILURE</span><span class="op">,</span>
+    <span class="fn">Monitor</span><span class="op">.</span><span class="var">EXECUTION_TIMEOUT</span><span class="op">,</span>
+  <span class="op">],</span>
+  <span class="var">recovery</span><span class="op">:</span> <span class="fn">RecoveryStrategy</span><span class="op">.</span><span class="var">AUTO</span><span class="op">,</span>
+  <span class="var">auditLog</span><span class="op">:</span> <span class="str">'./logs/failsafe.jsonl'</span><span class="op">,</span>
+<span class="op">});</span>
+
+<span class="cm">// Monitor any async function</span>
+<span class="kw">const</span> <span class="var">safeAgent</span> <span class="op">=</span> <span class="var">fs</span><span class="op">.</span><span class="fn">wrap</span><span class="op">(</span><span class="kw">async</span> <span class="op">(</span><span class="var">query</span><span class="op">:</span> <span class="type">string</span><span class="op">):</span> <span class="type">Promise</span><span class="op">&lt;</span><span class="type">string</span><span class="op">&gt; => {</span>
+  <span class="kw">const</span> <span class="var">response</span> <span class="op">=</span> <span class="kw">await</span> <span class="var">llm</span><span class="op">.</span><span class="fn">generate</span><span class="op">(</span><span class="var">query</span><span class="op">);</span>
+  <span class="kw">return</span> <span class="var">response</span><span class="op">.</span><span class="var">text</span><span class="op">;</span>
+<span class="op">});</span>
+
+<span class="cm">// Custom recovery for specific failure types</span>
+<span class="var">fs</span><span class="op">.</span><span class="fn">onFailure</span><span class="op">(</span><span class="str">'hallucination'</span><span class="op">,</span> <span class="kw">async</span> <span class="op">(</span><span class="var">event</span><span class="op">) => {</span>
+  <span class="kw">return await</span> <span class="var">llm</span><span class="op">.</span><span class="fn">generate</span><span class="op">(</span><span class="var">event</span><span class="op">.</span><span class="var">originalQuery</span><span class="op">, {</span>
+    <span class="var">temperature</span><span class="op">:</span> <span class="num">0.1</span><span class="op">,</span>
+    <span class="var">grounding</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span>
+  <span class="op">});</span>
+<span class="op">});</span>
+
+<span class="cm">// Run with full protection</span>
+<span class="kw">const</span> <span class="var">result</span> <span class="op">=</span> <span class="kw">await</span> <span class="fn">safeAgent</span><span class="op">(</span><span class="str">'Analyze Q4 revenue trends'</span><span class="op">);</span>
+<span class="var">console</span><span class="op">.</span><span class="fn">log</span><span class="op">(</span><span class="var">result</span><span class="op">);</span></pre>
+        </div>
+
+        <div class="code-panel" id="panel-rest">
+          <button class="copy-code-btn" onclick="copyCodeBlock('panel-rest')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copy
+          </button>
+          <pre><span class="cm"># Submit an agent action for analysis</span>
+<span class="var">$</span> <span class="fn">curl</span> <span class="op">-X</span> <span class="var">POST</span> <span class="str">https://api.failsafe.dev/v1/analyze</span> <span class="op">\</span>
+  <span class="op">-H</span> <span class="str">"Authorization: Bearer fs_live_..."</span> <span class="op">\</span>
+  <span class="op">-H</span> <span class="str">"Content-Type: application/json"</span> <span class="op">\</span>
+  <span class="op">-d</span> <span class="str">'{
+    "agent_id": "support-agent-v2",
+    "action": "generate_response",
+    "input": "What is your return policy?",
+    "output": "Our return policy allows...",
+    "monitors": ["hallucination", "safety_violation"]
+  }'</span>
+
+<span class="cm"># Response</span>
+<span class="op">{</span>
+  <span class="str">"status"</span><span class="op">:</span> <span class="str">"pass"</span><span class="op">,</span>
+  <span class="str">"failures_detected"</span><span class="op">:</span> <span class="num">0</span><span class="op">,</span>
+  <span class="str">"monitors"</span><span class="op">: {</span>
+    <span class="str">"hallucination"</span><span class="op">:</span> <span class="op">{</span> <span class="str">"score"</span><span class="op">:</span> <span class="num">0.02</span><span class="op">,</span> <span class="str">"pass"</span><span class="op">:</span> <span class="kw">true</span> <span class="op">},</span>
+    <span class="str">"safety_violation"</span><span class="op">:</span> <span class="op">{</span> <span class="str">"score"</span><span class="op">:</span> <span class="num">0.00</span><span class="op">,</span> <span class="str">"pass"</span><span class="op">:</span> <span class="kw">true</span> <span class="op">}</span>
+  <span class="op">},</span>
+  <span class="str">"latency_ms"</span><span class="op">:</span> <span class="num">12</span>
+<span class="op">}</span>
+
+<span class="cm"># Get failure analytics</span>
+<span class="var">$</span> <span class="fn">curl</span> <span class="str">https://api.failsafe.dev/v1/report?hours=24</span> <span class="op">\</span>
+  <span class="op">-H</span> <span class="str">"Authorization: Bearer fs_live_..."</span></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ============================================================
+       DOMAIN SOLUTIONS
+       ============================================================ -->
+  <section class="domains-section" id="domains">
+    <div class="container">
+      <div class="eyebrow reveal">Industries</div>
+      <h2 class="section-title reveal reveal-delay-1">Purpose-Built for Every Industry</h2>
+      <p class="section-subtitle reveal reveal-delay-2">
+        Domain-specific failure detection tuned to the unique risks and compliance requirements of your industry.
+      </p>
+
+      <div class="domain-grid">
+        <div class="domain-card reveal reveal-delay-1 tilt-card">
+          <div class="domain-card-icon di-rose">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
+          </div>
+          <h3>Healthcare AI</h3>
+          <p>Catch diagnostic errors, drug interaction hallucinations, compliance violations, and treatment recommendation failures before they impact patient outcomes. HIPAA-compliant audit trails included.</p>
+        </div>
+
+        <div class="domain-card reveal reveal-delay-2 tilt-card">
+          <div class="domain-card-icon di-blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>
+          </div>
+          <h3>Financial Systems</h3>
+          <p>Prevent fraudulent transaction approvals, detect data integrity violations in real-time trading systems, and enforce regulatory compliance across automated financial workflows.</p>
+        </div>
+
+        <div class="domain-card reveal reveal-delay-3 tilt-card">
+          <div class="domain-card-icon di-purple">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0012 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 01-2.031.352 5.988 5.988 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.971zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 01-2.031.352 5.989 5.989 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.971z"/></svg>
+          </div>
+          <h3>Legal AI</h3>
+          <p>Detect hallucinated case citations, fabricated statutes, and incorrect legal precedent references. Prevent confidentiality breaches and ensure accuracy in contract analysis and legal research.</p>
+        </div>
+
+        <div class="domain-card reveal reveal-delay-4 tilt-card">
+          <div class="domain-card-icon di-amber">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"/></svg>
+          </div>
+          <h3>Customer Service</h3>
+          <p>Catch agent hallucinations before they reach customers. Monitor response quality in real time, enforce policy compliance, and maintain consistent service across thousands of concurrent conversations.</p>
+        </div>
+
+        <div class="domain-card reveal reveal-delay-5 tilt-card">
+          <div class="domain-card-icon di-green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
+          </div>
+          <h3>Autonomous Systems</h3>
+          <p>Safety-critical failure prevention for robotics, self-driving, and industrial automation. Real-time boundary monitoring, emergency shutdown protocols, and redundant safety verification layers.</p>
+        </div>
+
+        <div class="domain-card reveal reveal-delay-6 tilt-card">
+          <div class="domain-card-icon di-orange">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"/></svg>
+          </div>
+          <h3>Code Generation</h3>
+          <p>Prevent insecure code output, catch syntax errors and logic bugs, validate generated solutions against test suites, and block code that introduces known vulnerabilities or anti-patterns.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ============================================================
+       FEATURES GRID
+       ============================================================ -->
+  <section class="features-section" id="features">
+    <div class="container">
+      <div class="eyebrow reveal">Capabilities</div>
+      <h2 class="section-title reveal reveal-delay-1">Everything You Need</h2>
+      <p class="section-subtitle reveal reveal-delay-2">
+        A complete toolkit for AI failure intelligence. From SDKs to storage, monitoring to compliance.
+      </p>
+
+      <div class="features-grid">
+        <div class="feature-card reveal reveal-delay-1">
+          <div class="feature-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.75 3.03v.568c0 .334.148.65.405.864a4.5 4.5 0 010 6.136.883.883 0 00-.405.864v.568c0 .845-.683 1.528-1.528 1.528-.798 0-1.462-.604-1.524-1.4l-.009-.12a3 3 0 010-4.056l.009-.12c.062-.796.726-1.4 1.524-1.4h.028M2.818 9.252a4.493 4.493 0 011.932-.955m0 0A4.494 4.494 0 016 8.25c.69 0 1.35.156 1.938.432M4.75 8.297a4.492 4.492 0 00-.943 1.955m14.443-1.955a4.493 4.493 0 00-1.932-.955m0 0A4.494 4.494 0 0018 8.25c-.69 0-1.35.156-1.938.432m3.188-.132a4.492 4.492 0 01.943 1.955"/><path d="M12 18.75a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg>
+          </div>
+          <h4>REST API</h4>
+          <p>Language-agnostic HTTP endpoints</p>
+        </div>
+
+        <div class="feature-card reveal reveal-delay-2">
+          <div class="feature-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z"/></svg>
+          </div>
+          <h4>Python SDK</h4>
+          <p>Native Python with async support</p>
+        </div>
+
+        <div class="feature-card reveal reveal-delay-3">
+          <div class="feature-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"/></svg>
+          </div>
+          <h4>TypeScript SDK</h4>
+          <p>Fully typed with generics</p>
+        </div>
+
+        <div class="feature-card reveal reveal-delay-4">
+          <div class="feature-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z"/></svg>
+          </div>
+          <h4>MCP Server</h4>
+          <p>Model Context Protocol native</p>
+        </div>
+
+        <div class="feature-card reveal reveal-delay-5">
+          <div class="feature-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z"/></svg>
+          </div>
+          <h4>CLI Tool</h4>
+          <p>Terminal-first workflows</p>
+        </div>
+
+        <div class="feature-card reveal reveal-delay-6">
+          <div class="feature-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125"/></svg>
+          </div>
+          <h4>SQLite Storage</h4>
+          <p>Zero-config local persistence</p>
+        </div>
+
+        <div class="feature-card reveal reveal-delay-7">
+          <div class="feature-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15a2.25 2.25 0 012.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"/></svg>
+          </div>
+          <h4>Audit Logging</h4>
+          <p>Full compliance audit trail</p>
+        </div>
+
+        <div class="feature-card reveal reveal-delay-8">
+          <div class="feature-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
+          </div>
+          <h4>Full Documentation</h4>
+          <p>Guides, API ref, examples</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ============================================================
+       CTA / PRICING
+       ============================================================ -->
+  <section class="cta-section" id="pricing">
+    <div class="container">
+      <div class="eyebrow reveal">Get Started</div>
+      <h2 class="cta-title reveal reveal-delay-1">Make Your AI Reliable</h2>
+      <p class="cta-subtitle reveal reveal-delay-2">
+        Open source core. Enterprise plans for teams that need SLA guarantees, dedicated support, and custom failure mode development.
+      </p>
+
+      <div class="cta-buttons reveal reveal-delay-3">
+        <a href="#" class="btn-primary">
+          Start Free
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#" class="btn-outline">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+          Schedule Demo
+        </a>
+      </div>
+
+      <div class="cta-terminal reveal reveal-delay-4">
+        <span class="prompt">$</span>
+        <code>npm install @failsafe/core</code>
+        <button class="copy-btn" onclick="copyToClipboard('npm install @failsafe/core')" aria-label="Copy command">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="#" class="navbar-logo" style="margin-bottom:4px;">
+            <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;">
+              <path d="M16 3L4 9v14l12 6 12-6V9L16 3z" fill="rgba(239,68,68,0.1)" stroke="#ef4444"/>
+              <path d="M16 11l-6 3v6l6 3 6-3v-6l-6-3z" fill="rgba(239,68,68,0.2)" stroke="#ef4444"/>
+            </svg>
+            FailSafe
+          </a>
+          <p>AI failure intelligence platform. Predict, detect, and recover from AI agent failures before they reach production.</p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="#platform">Platform</a></li>
+            <li><a href="#taxonomy">Failure Modes</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+            <li><a href="#">Changelog</a></li>
+            <li><a href="#">Roadmap</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Developers</h4>
+          <ul>
+            <li><a href="#">Documentation</a></li>
+            <li><a href="#">API Reference</a></li>
+            <li><a href="#">Python SDK</a></li>
+            <li><a href="#">TypeScript SDK</a></li>
+            <li><a href="#">MCP Server</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Case Studies</a></li>
+            <li><a href="#">Failure Database</a></li>
+            <li><a href="#">Community</a></li>
+            <li><a href="#">Status Page</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Contact</a></li>
+            <li><a href="#">Security</a></li>
+            <li><a href="#">Legal</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 FailSafe. All rights reserved.</p>
+        <div class="footer-bottom-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+          <a href="#">Cookie Policy</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Copy Feedback Toast -->
+  <div class="copy-feedback" id="copyFeedback">Copied to clipboard</div>
+
+  <!-- ============================================================
+       JAVASCRIPT
+       ============================================================ -->
+  <script>
+    /* ==========================================================
+       1. ANIMATED MESH BACKGROUND
+       ========================================================== */
+    (function initMeshBackground() {
+      const canvas = document.getElementById('meshCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let w, h, cols, rows, dots = [];
+      const spacing = 60;
+
+      function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+        cols = Math.ceil(w / spacing) + 1;
+        rows = Math.ceil(h / spacing) + 1;
+        dots = [];
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            dots.push({
+              x: c * spacing,
+              y: r * spacing,
+              ox: c * spacing,
+              oy: r * spacing,
+              vx: (Math.random() - 0.5) * 0.3,
+              vy: (Math.random() - 0.5) * 0.3
+            });
+          }
+        }
+      }
+
+      function draw(time) {
+        ctx.clearRect(0, 0, w, h);
+        for (let i = 0; i < dots.length; i++) {
+          const d = dots[i];
+          d.x = d.ox + Math.sin(time * 0.0005 + i * 0.1) * 8;
+          d.y = d.oy + Math.cos(time * 0.0004 + i * 0.12) * 8;
+          ctx.beginPath();
+          ctx.arc(d.x, d.y, 1, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(239, 68, 68, 0.12)';
+          ctx.fill();
+        }
+
+        // Draw connections
+        for (let i = 0; i < dots.length; i++) {
+          const d = dots[i];
+          const col = i % cols;
+          const row = Math.floor(i / cols);
+          // Right neighbor
+          if (col < cols - 1) {
+            const r = dots[i + 1];
+            ctx.beginPath();
+            ctx.moveTo(d.x, d.y);
+            ctx.lineTo(r.x, r.y);
+            ctx.strokeStyle = 'rgba(239, 68, 68, 0.04)';
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+          // Bottom neighbor
+          if (row < rows - 1) {
+            const b = dots[i + cols];
+            ctx.beginPath();
+            ctx.moveTo(d.x, d.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.strokeStyle = 'rgba(239, 68, 68, 0.04)';
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+
+      resize();
+      window.addEventListener('resize', resize);
+      requestAnimationFrame(draw);
+    })();
+
+    /* ==========================================================
+       2. HERO DOT PATTERN
+       ========================================================== */
+    (function initHeroDots() {
+      const canvas = document.getElementById('heroDots');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let w, h;
+
+      function resize() {
+        const section = canvas.parentElement;
+        w = canvas.width = section.offsetWidth;
+        h = canvas.height = section.offsetHeight;
+      }
+
+      function draw(time) {
+        ctx.clearRect(0, 0, w, h);
+
+        // Radial gradient overlay
+        const grd = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w * 0.6);
+        grd.addColorStop(0, 'rgba(239, 68, 68, 0.06)');
+        grd.addColorStop(0.5, 'rgba(249, 115, 22, 0.03)');
+        grd.addColorStop(1, 'transparent');
+        ctx.fillStyle = grd;
+        ctx.fillRect(0, 0, w, h);
+
+        // Dot pattern
+        const sp = 32;
+        const cols = Math.ceil(w / sp);
+        const rows = Math.ceil(h / sp);
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const x = c * sp + sp / 2;
+            const y = r * sp + sp / 2;
+            const dist = Math.sqrt(Math.pow(x - w / 2, 2) + Math.pow(y - h / 2, 2));
+            const maxDist = Math.sqrt(Math.pow(w / 2, 2) + Math.pow(h / 2, 2));
+            const opacity = Math.max(0, 0.2 - (dist / maxDist) * 0.2);
+            ctx.beginPath();
+            ctx.arc(x, y, 1, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(239, 68, 68, ${opacity})`;
+            ctx.fill();
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+
+      resize();
+      window.addEventListener('resize', resize);
+      requestAnimationFrame(draw);
+    })();
+
+    /* ==========================================================
+       3. SCROLL REVEAL (IntersectionObserver)
+       ========================================================== */
+    (function initScrollReveal() {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('revealed');
+            }
+          });
+        },
+        { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+      );
+
+      document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach((el) => {
+        observer.observe(el);
+      });
+    })();
+
+    /* ==========================================================
+       4. TYPEWRITER EFFECT
+       ========================================================== */
+    (function initTypewriter() {
+      const el = document.getElementById('typewriterText');
+      if (!el) return;
+
+      const phrases = [
+        'Hallucination detected \u2192 Recovery in 0.2s',
+        'Cascade failure prevented \u2192 Circuit breaker engaged',
+        'Recovery executed in 0.3s \u2192 Zero downtime',
+        'Safety boundary enforced \u2192 Agent contained',
+        'Behavioral drift detected \u2192 Auto-corrected',
+        'Data integrity verified \u2192 All checks passed'
+      ];
+
+      let phraseIdx = 0;
+      let charIdx = 0;
+      let deleting = false;
+      let pauseTimer = 0;
+
+      function tick() {
+        const current = phrases[phraseIdx];
+
+        if (!deleting) {
+          el.textContent = current.substring(0, charIdx + 1);
+          charIdx++;
+          if (charIdx === current.length) {
+            pauseTimer = setTimeout(() => {
+              deleting = true;
+              tick();
+            }, 2200);
+            return;
+          }
+          setTimeout(tick, 40 + Math.random() * 30);
+        } else {
+          el.textContent = current.substring(0, charIdx);
+          charIdx--;
+          if (charIdx < 0) {
+            deleting = false;
+            charIdx = 0;
+            phraseIdx = (phraseIdx + 1) % phrases.length;
+            setTimeout(tick, 400);
+            return;
+          }
+          setTimeout(tick, 20);
+        }
+      }
+
+      setTimeout(tick, 1000);
+    })();
+
+    /* ==========================================================
+       5. ANIMATED COUNTERS
+       ========================================================== */
+    (function initCounters() {
+      const counters = document.querySelectorAll('.stat-value[data-target]');
+      let triggered = new Set();
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && !triggered.has(entry.target)) {
+              triggered.add(entry.target);
+              animateCounter(entry.target);
+            }
+          });
+        },
+        { threshold: 0.5 }
+      );
+
+      counters.forEach((c) => observer.observe(c));
+
+      function animateCounter(el) {
+        const target = parseFloat(el.dataset.target);
+        const suffix = el.dataset.suffix || '';
+        const prefix = el.dataset.prefix || '';
+        const decimals = parseInt(el.dataset.decimals) || 0;
+        const duration = 2000;
+        const startTime = performance.now();
+
+        function update(now) {
+          const elapsed = now - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 4); // ease out quart
+          const value = target * eased;
+
+          if (decimals > 0) {
+            el.textContent = prefix + value.toFixed(decimals) + suffix;
+          } else {
+            el.textContent = prefix + Math.floor(value) + suffix;
+          }
+
+          if (progress < 1) {
+            requestAnimationFrame(update);
+          } else {
+            if (decimals > 0) {
+              el.textContent = prefix + target.toFixed(decimals) + suffix;
+            } else {
+              el.textContent = prefix + target + suffix;
+            }
+          }
+        }
+
+        requestAnimationFrame(update);
+      }
+    })();
+
+    /* ==========================================================
+       6. NAVBAR SCROLL EFFECT
+       ========================================================== */
+    (function initNavScroll() {
+      const navbar = document.getElementById('navbar');
+      let lastScroll = 0;
+
+      window.addEventListener('scroll', () => {
+        const st = window.scrollY;
+        if (st > 80) {
+          navbar.classList.add('scrolled');
+        } else {
+          navbar.classList.remove('scrolled');
+        }
+        lastScroll = st;
+      });
+    })();
+
+    /* ==========================================================
+       7. MOBILE HAMBURGER MENU
+       ========================================================== */
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('active');
+      mobileMenu.classList.toggle('open');
+      document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+    });
+
+    function closeMobileMenu() {
+      hamburger.classList.remove('active');
+      mobileMenu.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    /* ==========================================================
+       8. TAXONOMY EXPAND/COLLAPSE
+       ========================================================== */
+    function toggleTaxonomy(card) {
+      const isExpanded = card.classList.contains('expanded');
+
+      // Close all others
+      document.querySelectorAll('.taxonomy-card.expanded').forEach((c) => {
+        if (c !== card) c.classList.remove('expanded');
+      });
+
+      if (isExpanded) {
+        card.classList.remove('expanded');
+      } else {
+        card.classList.add('expanded');
+      }
+    }
+
+    /* ==========================================================
+       9. CODE TABS
+       ========================================================== */
+    function switchTab(btn, panelId) {
+      // Deactivate all tabs
+      btn.parentElement.querySelectorAll('.code-tab').forEach((t) => t.classList.remove('active'));
+      btn.classList.add('active');
+
+      // Hide all panels
+      const window = btn.closest('.code-window');
+      window.querySelectorAll('.code-panel').forEach((p) => p.classList.remove('active'));
+      document.getElementById(panelId).classList.add('active');
+    }
+
+    /* ==========================================================
+       10. COPY TO CLIPBOARD
+       ========================================================== */
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        showCopyFeedback();
+      }).catch(() => {
+        // Fallback
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showCopyFeedback();
+      });
+    }
+
+    function copyCodeBlock(panelId) {
+      const panel = document.getElementById(panelId);
+      const pre = panel.querySelector('pre');
+      const text = pre.textContent || pre.innerText;
+      copyToClipboard(text);
+    }
+
+    function showCopyFeedback() {
+      const fb = document.getElementById('copyFeedback');
+      fb.classList.add('show');
+      setTimeout(() => fb.classList.remove('show'), 2000);
+    }
+
+    /* ==========================================================
+       11. 3D CARD TILT EFFECT
+       ========================================================== */
+    (function initTiltCards() {
+      document.querySelectorAll('.tilt-card').forEach((card) => {
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          const rotateX = ((y - centerY) / centerY) * -4;
+          const rotateY = ((x - centerX) / centerX) * 4;
+          card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = '';
+        });
+      });
+    })();
+
+    /* ==========================================================
+       12. SMOOTH SCROLL FOR ANCHOR LINKS
+       ========================================================== */
+    document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+      anchor.addEventListener('click', function (e) {
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          const offset = 80;
+          const top = target.getBoundingClientRect().top + window.scrollY - offset;
+          window.scrollTo({ top, behavior: 'smooth' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
