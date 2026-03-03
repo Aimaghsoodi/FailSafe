@@ -33,6 +33,7 @@ export class FailureReporter {
       errorStack: options?.errorStack,
       tags: options?.tags,
       context: options?.context ? JSON.stringify(options.context) : undefined,
+      timestamp: new Date().toISOString(),
       verificationStatus: 'unverified',
       version: 1,
     });

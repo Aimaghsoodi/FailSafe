@@ -75,6 +75,7 @@ export class FailSafeMiddleware {
         errorMessage,
         errorStack,
         context: JSON.stringify({ context }),
+        timestamp: new Date().toISOString(),
         verificationStatus: 'unverified',
         version: 1,
       };
