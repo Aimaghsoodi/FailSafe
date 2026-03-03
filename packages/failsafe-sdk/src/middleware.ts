@@ -74,7 +74,7 @@ export class FailSafeMiddleware {
         description: errorMessage,
         errorMessage,
         errorStack,
-        context: { context },
+        context: JSON.stringify({ context }),
         verificationStatus: 'unverified',
         version: 1,
       };
