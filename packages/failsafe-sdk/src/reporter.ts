@@ -32,7 +32,7 @@ export class FailureReporter {
       errorMessage: options?.errorMessage,
       errorStack: options?.errorStack,
       tags: options?.tags,
-      context: options?.context,
+      context: options?.context ? JSON.stringify(options.context) : undefined,
       verificationStatus: 'unverified',
       version: 1,
     });
