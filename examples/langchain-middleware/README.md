@@ -60,4 +60,4 @@ failures = client.query_failures(limit=100)
 ## See Also
 
 - Implementation: `failsafe_langchain.py`
-- FailSafe: https://github.com/AbtinDev/failsafe
+- FailSafe: https://github.com/Aimaghsoodi/FailSafe

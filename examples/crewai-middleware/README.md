@@ -53,4 +53,4 @@ team_failures = client.query_failures(team_id="my-crew")
 ## See Also
 
 - Implementation: `failsafe_crewai.py`
-- GitHub: https://github.com/AbtinDev/failsafe
+- GitHub: https://github.com/Aimaghsoodi/FailSafe

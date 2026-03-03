@@ -1,95 +1,278 @@
-# FailSafe: Collective AI Failure Intelligence
+# FailSafe
 
-[![npm version](https://img.shields.io/npm/v/@failsafe/core.svg)](https://www.npmjs.com/package/@failsafe/core)
-[![TypeScript](https://img.shields.io/badge/language-TypeScript-blue.svg)](https://www.typescriptlang.org/)
+**AI Failure Intelligence Platform**
+
+[![CI](https://github.com/Aimaghsoodi/FailSafe/actions/workflows/ci.yml/badge.svg)](https://github.com/Aimaghsoodi/FailSafe/actions/workflows/ci.yml)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue.svg)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-**Your AI tools fail. FailSafe makes sure they don't fail the same way twice.**
+---
 
-FailSafe is an open-source collective AI failure intelligence platform. It tracks, categorizes, and learns from AI failures across the industry. Think of it as the CVE database for AI mistakes: a shared, structured, machine-readable database of AI failures that helps all AI tools avoid repeating known mistakes.
+## What is FailSafe?
 
-## Why FailSafe?
+FailSafe is an open-source platform for tracking, classifying, and learning from AI agent failures. It provides a structured, machine-readable taxonomy of failure modes so AI tools can check for known risks before making the same mistakes.
 
-AI systems hallucinate, reason incorrectly, violate instructions, and produce harmful outputs. These failures are predictable and follow patterns. FailSafe captures those patterns so every connected AI tool can check for known risks before making the same mistakes.
+Think of it as the CVE database for AI failures — a shared intelligence layer that helps every connected tool avoid repeating known mistakes.
+
+---
 
 ## Quick Start
 
-Install the core library:
+### Install
 
 ```bash
 npm install @failsafe/core
 ```
 
-Report a failure:
+### Report a Failure
 
 ```typescript
-import { createFailureReport } from "@failsafe/core";
+import { createFailureReport } from '@failsafe/core';
 
 const report = createFailureReport(
-  "model.hallucination",
-  "high",
-  "general",
-  "Fabricated court case citation",
-  "The model cited a non-existent court case as legal precedent"
+  'model.hallucination',   // failure type
+  'high',                  // severity
+  'reasoning',             // domain
+  'Fabricated citation',   // title
+  'Model cited a non-existent court case as legal precedent'
 );
+
+console.log(report.id);                 // "report_V1StGXR8..."
+console.log(report.verificationStatus); // "unverified"
 ```
 
-Or use the CLI:
+### Builder Pattern
 
-```bash
-npm install -g failsafe
+```typescript
+import { FailureReportBuilder } from '@failsafe/core';
 
-failsafe submit
-failsafe check "What medications interact with warfarin?"
-failsafe search "hallucination"
-failsafe stats
+const report = FailureReportBuilder
+  .create('security.prompt_injection', 'critical', 'security',
+    'Prompt injection detected',
+    'User input contained system prompt override attempt')
+  .withError('Malicious prompt detected in user input')
+  .build();
 ```
 
-## Package Overview
+### Update and Verify Reports
 
-| Package | Description | Status |
-|---------|-------------|--------|
-| **@failsafe/core** | Core library with failure reporting, patterns, risk scoring | Production |
-| **@failsafe/api** | REST API server (Hono) with SQLite storage | Production |
-| **@failsafe/sdk** | TypeScript SDK for API consumers | Production |
-| **@failsafe/mcp-server** | Model Context Protocol server for AI agents | Production |
+```typescript
+import {
+  updateFailureReport,
+  verifyFailureReport,
+  resolveFailureReport
+} from '@failsafe/core';
 
-## Core Concepts
+// Update fields
+const updated = updateFailureReport(report, {
+  severity: 'critical',
+  tags: ['production', 'urgent']
+});
 
-**Failure Reports** are structured records of individual AI failure instances. Each captures the query, the failed response, what should have happened, and classification metadata.
+// Mark as verified by a reviewer
+const verified = verifyFailureReport(report, 'reviewer@team.com', 'Confirmed in production logs');
 
-**Failure Patterns** are generalized descriptions of recurring failure types, derived from clusters of similar reports.
+// Mark as resolved
+const resolved = resolveFailureReport(verified, 'Fixed with input sanitization');
+console.log(resolved.verificationStatus); // "resolved"
+```
 
-**Risk Signals** are the result of checking a query against known failure patterns BEFORE sending it to an AI model.
+---
 
-**Taxonomy** is a hierarchical classification system with 6 categories (hallucination, reasoning error, instruction violation, context error, tool/action error, output quality) and 28 subtypes.
+## Failure Taxonomy
+
+FailSafe classifies failures into 6 top-level categories with 35+ subtypes:
+
+| Category | Examples |
+|----------|----------|
+| **Security** | `security.prompt_injection`, `security.data_leak`, `security.unauthorized_access` |
+| **Execution** | `execution.timeout`, `execution.crash`, `execution.out_of_memory` |
+| **Model** | `model.hallucination`, `model.bias_detected`, `model.inference_error` |
+| **Logic** | `logic.invalid_reasoning`, `logic.circular_dependency`, `logic.off_topic` |
+| **I/O** | `io.invalid_input`, `io.malformed_data`, `io.network_error` |
+| **Integration** | `integration.api_error`, `integration.dependency_missing`, `integration.version_mismatch` |
+
+### Severity Levels
+
+| Level | Score | Description |
+|-------|-------|-------------|
+| `critical` | 100 | System-breaking, data loss, security breach |
+| `high` | 80 | Major feature broken, significant impact |
+| `medium` | 50 | Degraded experience, workaround available |
+| `low` | 25 | Minor issue, cosmetic |
+| `info` | 10 | Informational, no user impact |
+
+---
+
+## Risk Scoring
+
+```typescript
+import {
+  calculateImpactScore,
+  calculateUrgencyScore,
+  calculateCompositeScore,
+  rankReportsByScore
+} from '@failsafe/core';
+
+// Impact score (0-100) based on severity, domain, and resolution status
+const impact = calculateImpactScore(report);
+
+// Urgency score (0-100) based on severity and verification status
+const urgency = calculateUrgencyScore(report);
+
+// Composite score combining impact and urgency
+const composite = calculateCompositeScore(report);
+
+// Rank multiple reports by composite score (highest first)
+const ranked = rankReportsByScore(reports);
+ranked.forEach(({ report, score }) => {
+  console.log(`${report.title}: ${score}`);
+});
+```
+
+---
+
+## Querying and Filtering
+
+```typescript
+import {
+  filterFailureReports,
+  queryFailureReports,
+  calculateFailureStats,
+  groupBy
+} from '@failsafe/core';
+
+// Filter by type, severity, domain, date range
+const critical = filterFailureReports(reports, {
+  severities: ['critical', 'high'],
+  domains: ['security']
+});
+
+// Paginated queries
+const page = queryFailureReports(reports, {
+  types: ['model.hallucination'],
+  verificationStatus: ['unverified']
+}, 0, 20);
+
+console.log(page.total);   // total matching reports
+console.log(page.hasMore); // whether more pages exist
+
+// Aggregate statistics
+const stats = calculateFailureStats(reports);
+console.log(stats.totalReports);
+console.log(stats.bySeverity);       // { critical: 3, high: 12, ... }
+console.log(stats.resolutionRate);   // 0.75
+
+// Group by any field
+const byDomain = groupBy(reports, 'domain');
+```
+
+---
+
+## Pattern Matching
+
+```typescript
+import { createFailureReport } from '@failsafe/core';
+import type { FailurePattern } from '@failsafe/core';
+
+// Define a failure pattern
+const pattern: FailurePattern = {
+  id: 'pattern_hallucination_citations',
+  name: 'Citation Hallucination',
+  description: 'Model fabricates citations or references',
+  failureTypes: ['model.hallucination'],
+  conditions: [{ field: 'domain', operator: 'equals', value: 'reasoning' }],
+  severity: 'high',
+  commonCauses: ['Insufficient training data', 'No retrieval augmentation'],
+  preventionStrategies: ['Use RAG pipeline', 'Add citation verification step'],
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString()
+};
+```
+
+---
+
+## Validation and Fingerprinting
+
+```typescript
+import { validateFailureReport } from '@failsafe/core';
+import { generateFingerprint } from '@failsafe/core';
+
+// Validate a report against the schema
+const result = validateFailureReport(report);
+console.log(result.valid);    // true/false
+console.log(result.errors);   // validation errors
+
+// Generate a fingerprint for deduplication
+const fingerprint = generateFingerprint(report);
+console.log(fingerprint.hash); // unique hash based on type + message + stack
+```
+
+---
+
+## MCP Server (AI Agent Integration)
+
+Add to your AI tool's MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "failsafe": {
+      "command": "npx",
+      "args": ["@failsafe/mcp-server"]
+    }
+  }
+}
+```
+
+The MCP server exposes tools for submitting failure reports, checking risks, searching known failures, and retrieving statistics.
+
+---
+
+## Packages
+
+| Package | Description |
+|---------|-------------|
+| [`@failsafe/core`](./packages/failsafe-core/) | Core library — failure reporting, taxonomy, scoring, matching, validation |
+| [`@failsafe/mcp-server`](./packages/failsafe-mcp/) | MCP server — expose failure intelligence to AI agents |
+| [`@failsafe/api`](./packages/failsafe-api/) | REST API server with Hono |
+
+---
 
 ## Development
 
 ```bash
-git clone https://github.com/AbtinDev/failsafe.git
-cd failsafe
+git clone https://github.com/Aimaghsoodi/FailSafe.git
+cd FailSafe
 pnpm install
 pnpm build
-pnpm test
+pnpm test    # 50 tests
 ```
-
-## Documentation
-
-- [Specification](spec/)
-- [Failure Taxonomy](spec/taxonomy/)
-- [JSON Schemas](spec/schema/)
-- [API Reference](website/docs/api-reference.md)
-- [MCP Integration](website/docs/mcp-integration.md)
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development workflow, code style, testing requirements, and PR process.
-
-## License
-
-MIT Licensed. See [LICENSE](LICENSE).
 
 ---
 
-Part of the [OpenClaw](https://github.com/AbtinDev) ecosystem.
+## API Reference
+
+### Failure Reports
+`createFailureReport(type, severity, domain, title, description)` · `updateFailureReport(report, updates)` · `verifyFailureReport(report, verifiedBy, notes?)` · `resolveFailureReport(report, notes?)` · `isCritical(report)`
+
+### FailureReportBuilder
+`create(type, severity, domain, title, description)` · `withError(message, stack?, code?)` · `build()`
+
+### Scoring
+`calculateImpactScore(report)` · `calculateUrgencyScore(report)` · `calculateCompositeScore(report)` · `rankReportsByScore(reports)` · `createRiskFactorsFromReport(report)`
+
+### Querying
+`filterFailureReports(reports, filter)` · `queryFailureReports(reports, filter, offset?, limit?)` · `calculateFailureStats(reports)` · `groupBy(reports, key)`
+
+### Taxonomy
+`isValidFailureType(type)` · `getCategory(type)` · `getSubcategories(category)` · `getDefaultSeverityForType(type)`
+
+### Validation
+`validateFailureReport(report)` · `serializeReport(report)` · `deserializeReport(json)`
+
+---
+
+## License
+
+MIT — see [LICENSE](./LICENSE).
