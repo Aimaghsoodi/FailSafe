@@ -1,0 +1,899 @@
+openapi: 3.1.0
+info:
+  title: FailSafe API
+  description: |
+    FailSafe is an open failure-reporting and risk-checking system for AI agents.
+    It lets you submit failure reports, search and filter them, verify or resolve
+    reports, retrieve failure taxonomy and statistics, and run pre-flight risk
+    checks against known failure patterns.
+
+    Use this API to:
+    - Report failures encountered by AI agents (hallucinations, crashes, security issues, etc.)
+    - Search and browse the failure knowledge base
+    - Verify or resolve reported failures
+    - Check whether a planned action matches known failure patterns before executing it
+    - Retrieve aggregate statistics about failure trends
+    - Browse the failure taxonomy for categorization
+  version: 0.1.0
+  contact:
+    name: FailSafe
+    url: https://github.com/failsafe-engineering/failsafe
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.failsafe.dev
+    description: Production server
+  - url: http://localhost:3100
+    description: Local development server
+
+tags:
+  - name: Reports
+    description: Submit, list, retrieve, verify, and resolve failure reports
+  - name: Check
+    description: Pre-flight risk check against known failure patterns
+  - name: Taxonomy
+    description: Browse the failure type taxonomy
+  - name: Stats
+    description: Aggregate failure statistics
+
+paths:
+  /api/v1/reports:
+    post:
+      operationId: submitReport
+      summary: Submit a failure report
+      description: |
+        Submit a new failure report to the FailSafe system. Each report captures
+        a specific failure event including its type, severity, domain, and
+        descriptive details. The report is assigned an ID and tracked for
+        verification and resolution.
+      tags:
+        - Reports
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FailureReportInput'
+            example:
+              type: model.hallucination
+              severity: high
+              domain: reasoning
+              title: Model fabricated non-existent API endpoint
+              description: >-
+                The model generated code calling a REST endpoint /api/v3/users/verify
+                that does not exist in the target API. The hallucinated endpoint was
+                presented with high confidence.
+              errorMessage: "404 Not Found: /api/v3/users/verify"
+              tags:
+                - hallucination
+                - code-generation
+                - api
+      responses:
+        '201':
+          description: Report created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureReport'
+              example:
+                id: report_abc123
+                type: model.hallucination
+                severity: high
+                domain: reasoning
+                title: Model fabricated non-existent API endpoint
+                description: >-
+                  The model generated code calling a REST endpoint /api/v3/users/verify
+                  that does not exist in the target API.
+                timestamp: "2026-03-07T12:00:00.000Z"
+                verificationStatus: unverified
+                version: 1
+                createdAt: "2026-03-07T12:00:00.000Z"
+                updatedAt: "2026-03-07T12:00:00.000Z"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+    get:
+      operationId: listReports
+      summary: List and filter failure reports
+      description: |
+        Retrieve a paginated list of failure reports. You can filter by failure
+        type, severity, domain, and verification status. Results are returned
+        with pagination metadata.
+      tags:
+        - Reports
+      parameters:
+        - name: types
+          in: query
+          description: Comma-separated list of failure types to filter by (e.g., "model.hallucination,execution.crash")
+          schema:
+            type: string
+          example: model.hallucination,logic.invalid_reasoning
+        - name: severities
+          in: query
+          description: Comma-separated severity levels to filter by
+          schema:
+            type: string
+          example: critical,high
+        - name: domains
+          in: query
+          description: Comma-separated domains to filter by
+          schema:
+            type: string
+          example: reasoning,code-generation
+        - name: status
+          in: query
+          description: Comma-separated verification statuses to filter by
+          schema:
+            type: string
+          example: unverified,verified
+        - name: source
+          in: query
+          description: Filter by report source identifier
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Maximum number of results to return (default 50)
+          schema:
+            type: integer
+            default: 50
+            minimum: 1
+            maximum: 200
+        - name: offset
+          in: query
+          description: Number of results to skip for pagination (default 0)
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+      responses:
+        '200':
+          description: Paginated list of failure reports
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedReports'
+              example:
+                items:
+                  - id: report_abc123
+                    type: model.hallucination
+                    severity: high
+                    domain: reasoning
+                    title: Model fabricated non-existent API endpoint
+                    description: The model generated code calling a non-existent endpoint.
+                    timestamp: "2026-03-07T12:00:00.000Z"
+                    verificationStatus: unverified
+                    version: 1
+                    createdAt: "2026-03-07T12:00:00.000Z"
+                    updatedAt: "2026-03-07T12:00:00.000Z"
+                total: 1
+                offset: 0
+                limit: 50
+                hasMore: false
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+  /api/v1/reports/{id}:
+    get:
+      operationId: getReport
+      summary: Get a failure report by ID
+      description: |
+        Retrieve the full details of a specific failure report, including its
+        metadata, verification status, timeline, and any recommendations.
+      tags:
+        - Reports
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The unique report identifier
+          schema:
+            type: string
+          example: report_abc123
+      responses:
+        '200':
+          description: Full failure report details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureReport'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/reports/{id}/verify:
+    put:
+      operationId: verifyReport
+      summary: Verify a failure report
+      description: |
+        Change the verification status of a failure report. Valid transitions are:
+        unverified -> verified, disputed, or retracted;
+        disputed -> verified or retracted;
+        verified -> retracted.
+        Include optional verifier identity and notes.
+      tags:
+        - Reports
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The unique report identifier
+          schema:
+            type: string
+          example: report_abc123
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyReportInput'
+            example:
+              status: verified
+              verifiedBy: reviewer@example.com
+              notes: Confirmed hallucination — endpoint does not exist in API v3 spec.
+      responses:
+        '200':
+          description: Report verification status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureReport'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/reports/{id}/resolve:
+    put:
+      operationId: resolveReport
+      summary: Resolve a failure report
+      description: |
+        Mark a failure report as resolved with optional resolution notes
+        describing how the issue was addressed.
+      tags:
+        - Reports
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The unique report identifier
+          schema:
+            type: string
+          example: report_abc123
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResolveReportInput'
+            example:
+              notes: Added API endpoint validation to the prompt template. Model now cross-references the OpenAPI spec before generating API calls.
+      responses:
+        '200':
+          description: Report marked as resolved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureReport'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/taxonomy:
+    get:
+      operationId: getTaxonomy
+      summary: Get the failure taxonomy
+      description: |
+        Returns the complete failure type taxonomy organized by category.
+        This includes all recognized failure types grouped into categories
+        such as execution, I/O, model, logic, security, and integration failures.
+        Useful for understanding how to categorize failures when submitting reports.
+      tags:
+        - Taxonomy
+      responses:
+        '200':
+          description: The full failure taxonomy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Taxonomy'
+              example:
+                categories:
+                  - name: execution
+                    description: Runtime execution failures
+                    types:
+                      - execution.timeout
+                      - execution.out_of_memory
+                      - execution.crash
+                      - execution.hang
+                      - execution.invalid_state
+                      - execution.resource_exhaustion
+                  - name: model
+                    description: AI model inference failures
+                    types:
+                      - model.inference_error
+                      - model.token_limit_exceeded
+                      - model.hallucination
+                      - model.bias_detected
+                  - name: logic
+                    description: Reasoning and logic failures
+                    types:
+                      - logic.invalid_reasoning
+                      - logic.circular_dependency
+                      - logic.constraint_violation
+                      - logic.incomplete_reasoning
+                      - logic.incorrect_output
+                      - logic.off_topic
+                  - name: security
+                    description: Security-related failures
+                    types:
+                      - security.prompt_injection
+                      - security.unauthorized_access
+                      - security.data_leak
+
+  /api/v1/stats:
+    get:
+      operationId: getStats
+      summary: Get failure statistics
+      description: |
+        Returns aggregated statistics about all failure reports in the system,
+        including counts by type, severity, domain, and verification status,
+        as well as resolution rates and trending failure types.
+      tags:
+        - Stats
+      responses:
+        '200':
+          description: Aggregate failure statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureStats'
+              example:
+                totalReports: 142
+                bySeverity:
+                  critical: 8
+                  high: 34
+                  medium: 56
+                  low: 38
+                  info: 6
+                byDomain:
+                  reasoning: 42
+                  code-generation: 35
+                  security: 18
+                  data-processing: 15
+                  content-creation: 12
+                  planning: 8
+                  retrieval: 5
+                  agent-orchestration: 4
+                  performance: 2
+                  general: 1
+                averageSeverityScore: 2.4
+                unverifiedCount: 67
+                resolvedCount: 45
+                resolutionRate: 0.317
+
+  /api/v1/check:
+    post:
+      operationId: checkRisk
+      summary: Check if an action matches known failure patterns
+      description: |
+        Perform a pre-flight risk check by describing a planned action or
+        scenario. The system compares the input against known failure patterns
+        and returns a risk score, risk level, and any matched patterns.
+        Use this before executing potentially risky operations.
+      tags:
+        - Check
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RiskCheckInput'
+            example:
+              type: model.hallucination
+              title: Generate database migration script
+              description: >-
+                Using an LLM to generate a SQL migration script that alters
+                production tables based on a natural language description.
+              errorMessage: null
+      responses:
+        '200':
+          description: Risk assessment result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskSignal'
+              example:
+                id: risk_xyz789
+                riskLevel: high
+                riskScore: 72
+                matchedPatterns:
+                  - patternId: pattern_001
+                    patternName: LLM code generation without validation
+                    confidence: 0.72
+                recommendations: []
+                timestamp: "2026-03-07T12:00:00.000Z"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+components:
+  schemas:
+    FailureReportInput:
+      type: object
+      required:
+        - type
+        - severity
+        - domain
+        - title
+        - description
+      properties:
+        type:
+          type: string
+          description: >-
+            The failure type from the taxonomy (e.g., "model.hallucination",
+            "execution.crash", "security.prompt_injection")
+          example: model.hallucination
+        severity:
+          type: string
+          enum:
+            - critical
+            - high
+            - medium
+            - low
+            - info
+          description: How severe this failure is
+          example: high
+        domain:
+          type: string
+          enum:
+            - reasoning
+            - code-generation
+            - content-creation
+            - data-processing
+            - planning
+            - retrieval
+            - agent-orchestration
+            - security
+            - performance
+            - general
+          description: The domain where the failure occurred
+          example: reasoning
+        title:
+          type: string
+          description: A brief, descriptive title for the failure
+          example: Model fabricated non-existent API endpoint
+        description:
+          type: string
+          description: A detailed description of what went wrong
+          example: >-
+            The model generated code calling a REST endpoint /api/v3/users/verify
+            that does not exist in the target API.
+        context:
+          type: string
+          description: Additional context about the environment or situation
+        errorMessage:
+          type: string
+          description: The error message if one was produced
+        errorStack:
+          type: string
+          description: Stack trace if available
+        errorCode:
+          type: string
+          description: Machine-readable error code
+        input:
+          description: The input that led to the failure
+        output:
+          description: The actual output produced
+        expectedOutput:
+          description: What the correct output should have been
+        source:
+          type: string
+          description: Identifier for the system or agent that produced the failure
+        userId:
+          type: string
+          description: User identifier if applicable
+        sessionId:
+          type: string
+          description: Session identifier for tracking
+        tags:
+          type: array
+          items:
+            type: string
+          description: Tags for categorizing and searching the failure
+          example:
+            - hallucination
+            - code-generation
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Arbitrary key-value metadata
+
+    FailureReport:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique report identifier
+          example: report_abc123
+        type:
+          type: string
+          description: The failure type from the taxonomy
+          example: model.hallucination
+        severity:
+          type: string
+          enum:
+            - critical
+            - high
+            - medium
+            - low
+            - info
+          description: Severity level
+        domain:
+          type: string
+          enum:
+            - reasoning
+            - code-generation
+            - content-creation
+            - data-processing
+            - planning
+            - retrieval
+            - agent-orchestration
+            - security
+            - performance
+            - general
+          description: Domain where the failure occurred
+        title:
+          type: string
+          description: Brief title of the failure
+        description:
+          type: string
+          description: Detailed description
+        context:
+          type: string
+          description: Additional context
+        timestamp:
+          type: string
+          format: date-time
+          description: When the failure occurred
+        duration:
+          type: number
+          description: Duration of the failure in milliseconds
+        errorMessage:
+          type: string
+        errorStack:
+          type: string
+        errorCode:
+          type: string
+        input:
+          description: The input that led to the failure
+        output:
+          description: The actual output produced
+        expectedOutput:
+          description: What the correct output should have been
+        source:
+          type: string
+        userId:
+          type: string
+        sessionId:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        metadata:
+          type: object
+          additionalProperties: true
+        verificationStatus:
+          type: string
+          enum:
+            - unverified
+            - verified
+            - disputed
+            - resolved
+          description: Current verification status
+        verifiedBy:
+          type: string
+          description: Who verified the report
+        verificationNotes:
+          type: string
+          description: Notes from the verifier
+        resolvedAt:
+          type: string
+          format: date-time
+        resolutionNotes:
+          type: string
+        recommendations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recommendation'
+        version:
+          type: integer
+          description: Report version number
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Recommendation:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        priority:
+          type: string
+          enum:
+            - critical
+            - high
+            - medium
+            - low
+        category:
+          type: string
+          enum:
+            - immediate_action
+            - investigation
+            - monitoring
+            - documentation
+            - prevention
+
+    PaginatedReports:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FailureReport'
+        total:
+          type: integer
+          description: Total number of matching reports
+        offset:
+          type: integer
+          description: Current pagination offset
+        limit:
+          type: integer
+          description: Page size
+        hasMore:
+          type: boolean
+          description: Whether more results are available
+
+    VerifyReportInput:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum:
+            - verified
+            - disputed
+            - retracted
+          description: >-
+            The new verification status. Valid transitions:
+            unverified -> verified/disputed/retracted,
+            disputed -> verified/retracted,
+            verified -> retracted.
+        verifiedBy:
+          type: string
+          description: Identity of the person or system verifying
+        notes:
+          type: string
+          description: Notes explaining the verification decision
+
+    ResolveReportInput:
+      type: object
+      properties:
+        notes:
+          type: string
+          description: >-
+            Description of how the failure was resolved or mitigated
+
+    RiskCheckInput:
+      type: object
+      description: >-
+        Describe the action or scenario to check against known failure patterns.
+        Provide at least one of type, title, or description.
+      properties:
+        type:
+          type: string
+          description: The failure type to check for
+        title:
+          type: string
+          description: Brief title of the action or scenario
+        description:
+          type: string
+          description: Detailed description of what you plan to do
+        errorMessage:
+          type: string
+          description: An error message to match against patterns
+
+    RiskSignal:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique risk signal identifier
+        riskLevel:
+          type: string
+          enum:
+            - critical
+            - high
+            - medium
+            - low
+            - none
+          description: Overall risk level
+        riskScore:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: Numeric risk score (0 = no risk, 100 = critical risk)
+        matchedPatterns:
+          type: array
+          items:
+            type: object
+            properties:
+              patternId:
+                type: string
+                description: ID of the matched failure pattern
+              patternName:
+                type: string
+                description: Human-readable name of the pattern
+              confidence:
+                type: number
+                minimum: 0
+                maximum: 1
+                description: How strongly this pattern matches (0 to 1)
+          description: Failure patterns that match the described action
+        recommendations:
+          type: array
+          items:
+            type: string
+          description: Suggested actions to mitigate risk
+        timestamp:
+          type: string
+          format: date-time
+          description: When the risk check was performed
+
+    Taxonomy:
+      type: object
+      properties:
+        categories:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Category name (e.g., "execution", "model", "security")
+              description:
+                type: string
+                description: What this category covers
+              types:
+                type: array
+                items:
+                  type: string
+                description: The failure types in this category
+
+    FailureStats:
+      type: object
+      properties:
+        totalReports:
+          type: integer
+          description: Total number of failure reports in the system
+        byType:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Count of reports per failure type
+        bySeverity:
+          type: object
+          properties:
+            critical:
+              type: integer
+            high:
+              type: integer
+            medium:
+              type: integer
+            low:
+              type: integer
+            info:
+              type: integer
+          description: Count of reports per severity level
+        byDomain:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Count of reports per domain
+        byStatus:
+          type: object
+          properties:
+            unverified:
+              type: integer
+            verified:
+              type: integer
+            disputed:
+              type: integer
+            resolved:
+              type: integer
+          description: Count of reports per verification status
+        averageSeverityScore:
+          type: number
+          description: Average severity score across all reports
+        topFailureTypes:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              count:
+                type: integer
+          description: Most common failure types
+        topDomains:
+          type: array
+          items:
+            type: object
+            properties:
+              domain:
+                type: string
+              count:
+                type: integer
+          description: Most affected domains
+        unverifiedCount:
+          type: integer
+          description: Number of reports still unverified
+        resolvedCount:
+          type: integer
+          description: Number of resolved reports
+        resolutionRate:
+          type: number
+          description: Fraction of reports that have been resolved (0 to 1)
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+          example: VALIDATION_ERROR
+        message:
+          type: string
+          description: Human-readable error description
+          example: "Missing required fields: type, severity, domain, title, description"
+
+  responses:
+    ValidationError:
+      description: Request validation failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: VALIDATION_ERROR
+            message: "Missing required fields: type, severity, domain, title, description"
+
+    NotFound:
+      description: The requested resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: NOT_FOUND
+            message: "Failure report report_abc123 not found"
+
+    RateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: RATE_LIMITED
+            message: "Rate limit exceeded. Try again later."
