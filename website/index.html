@@ -1656,6 +1656,427 @@
       opacity: 1;
       transform: translateY(0);
     }
+
+    /* ============================================================
+       PYTHON PACKAGE SECTION
+       ============================================================ */
+    .python-section {
+      padding: 120px 0;
+      background: #030712;
+    }
+
+    .python-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      margin-top: 48px;
+      align-items: start;
+    }
+
+    .python-info h3 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .python-info p {
+      font-size: 15px;
+      color: #94a3b8;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .install-commands {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .install-cmd {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      background: rgba(15, 10, 26, 0.8);
+      border: 1px solid rgba(239, 68, 68, 0.15);
+      border-radius: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: #94a3b8;
+    }
+
+    .install-cmd .prompt { color: #22c55e; }
+    .install-cmd code { color: #f8fafc; }
+
+    .install-cmd .copy-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      color: #64748b;
+      transition: all 0.2s ease;
+      margin-left: auto;
+    }
+
+    .install-cmd .copy-btn:hover {
+      color: #f8fafc;
+      background: rgba(248, 250, 252, 0.1);
+    }
+
+    .install-cmd .copy-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .feature-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .feature-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 500;
+      font-family: 'JetBrains Mono', monospace;
+      color: #22c55e;
+      background: rgba(34, 197, 94, 0.08);
+      border: 1px solid rgba(34, 197, 94, 0.15);
+      border-radius: 100px;
+    }
+
+    .feature-tag svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    .python-code-window {
+      background: rgba(15, 10, 26, 0.8);
+      border: 1px solid rgba(239, 68, 68, 0.1);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .python-code-window .code-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 20px;
+      border-bottom: 1px solid rgba(239, 68, 68, 0.1);
+    }
+
+    .python-code-window .code-header .dot-r { width: 10px; height: 10px; border-radius: 50%; background: #ef4444; opacity: 0.7; }
+    .python-code-window .code-header .dot-y { width: 10px; height: 10px; border-radius: 50%; background: #eab308; opacity: 0.7; }
+    .python-code-window .code-header .dot-g { width: 10px; height: 10px; border-radius: 50%; background: #22c55e; opacity: 0.7; }
+
+    .python-code-window .code-header span.file-name {
+      margin-left: 12px;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #64748b;
+    }
+
+    .python-code-window pre {
+      padding: 24px;
+      font-size: 13px;
+      line-height: 1.7;
+      color: #94a3b8;
+      overflow-x: auto;
+    }
+
+    .python-code-window .kw { color: #c084fc; }
+    .python-code-window .fn { color: #60a5fa; }
+    .python-code-window .str { color: #34d399; }
+    .python-code-window .cm { color: #4b5563; }
+    .python-code-window .num { color: #fb923c; }
+    .python-code-window .var { color: #f8fafc; }
+    .python-code-window .type { color: #f472b6; }
+    .python-code-window .op { color: #94a3b8; }
+
+    /* ============================================================
+       FRAMEWORK INTEGRATIONS SECTION
+       ============================================================ */
+    .frameworks-section {
+      padding: 120px 0;
+      background: linear-gradient(180deg, #030712 0%, #0f0a1a 100%);
+    }
+
+    .frameworks-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 48px;
+    }
+
+    .framework-card {
+      padding: 32px;
+      background: rgba(15, 10, 26, 0.6);
+      border: 1px solid rgba(239, 68, 68, 0.1);
+      border-radius: 16px;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .framework-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #ef4444, #f97316);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .framework-card:hover::before { opacity: 1; }
+
+    .framework-card:hover {
+      border-color: rgba(239, 68, 68, 0.25);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+    }
+
+    .framework-card-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .framework-card-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      font-size: 20px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .framework-card-icon.fci-crewai { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+    .framework-card-icon.fci-langchain { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+    .framework-card-icon.fci-openai { background: rgba(168, 85, 247, 0.1); color: #a855f7; }
+
+    .framework-card-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .framework-card-header h3 {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .framework-card-header .framework-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      font-size: 10px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-radius: 4px;
+      margin-left: auto;
+    }
+
+    .framework-badge.fb-stable { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+    .framework-badge.fb-beta { background: rgba(234, 179, 8, 0.1); color: #eab308; }
+
+    .framework-card p {
+      font-size: 14px;
+      color: #94a3b8;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .framework-code {
+      background: rgba(3, 7, 18, 0.6);
+      border: 1px solid rgba(248, 250, 252, 0.06);
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .framework-code pre {
+      font-size: 12px;
+      line-height: 1.6;
+      color: #94a3b8;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .framework-code .kw { color: #c084fc; }
+    .framework-code .fn { color: #60a5fa; }
+    .framework-code .str { color: #34d399; }
+    .framework-code .cm { color: #4b5563; }
+    .framework-code .var { color: #f8fafc; }
+    .framework-code .op { color: #94a3b8; }
+
+    /* ============================================================
+       AI ASSISTANTS INTEGRATION SECTION
+       ============================================================ */
+    .assistants-section {
+      padding: 120px 0;
+      background: #030712;
+    }
+
+    .assistants-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      margin-top: 48px;
+    }
+
+    .assistant-card {
+      padding: 36px;
+      background: rgba(15, 10, 26, 0.6);
+      border: 1px solid rgba(239, 68, 68, 0.1);
+      border-radius: 16px;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .assistant-card:hover {
+      border-color: rgba(239, 68, 68, 0.25);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .assistant-card-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .assistant-card-icon {
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 14px;
+      flex-shrink: 0;
+    }
+
+    .assistant-card-icon.aci-chatgpt { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+    .assistant-card-icon.aci-claude { background: rgba(249, 115, 22, 0.1); color: #f97316; }
+
+    .assistant-card-icon svg {
+      width: 26px;
+      height: 26px;
+    }
+
+    .assistant-card-header h3 {
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    .assistant-card-header .assistant-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+      border-radius: 6px;
+    }
+
+    .assistant-badge.ab-openapi { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+    .assistant-badge.ab-mcp { background: rgba(249, 115, 22, 0.1); color: #f97316; }
+
+    .assistant-card > p {
+      font-size: 15px;
+      color: #94a3b8;
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    .assistant-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .assistant-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      background: rgba(3, 7, 18, 0.5);
+      border-radius: 10px;
+    }
+
+    .assistant-step-num {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .assistant-step-num.asn-green { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+    .assistant-step-num.asn-orange { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+
+    .assistant-step p {
+      font-size: 13px;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    .assistant-step code {
+      font-size: 12px;
+      padding: 2px 6px;
+      background: rgba(239, 68, 68, 0.08);
+      border-radius: 4px;
+      color: #f8fafc;
+    }
+
+    .assistant-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #ef4444;
+      transition: all 0.25s ease;
+    }
+
+    .assistant-link:hover {
+      color: #f97316;
+      gap: 12px;
+    }
+
+    .assistant-link svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Responsive additions for new sections */
+    @media (max-width: 1024px) {
+      .python-grid { grid-template-columns: 1fr; }
+      .frameworks-grid { grid-template-columns: 1fr 1fr; }
+      .assistants-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .frameworks-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -1715,6 +2136,7 @@
         <a href="#platform">Platform</a>
         <a href="#taxonomy">Failure Modes</a>
         <a href="#how-it-works">How It Works</a>
+        <a href="#ecosystem">Ecosystem</a>
         <a href="#pricing">Pricing</a>
       </div>
 
@@ -1738,6 +2160,7 @@
     <a href="#platform" onclick="closeMobileMenu()">Platform</a>
     <a href="#taxonomy" onclick="closeMobileMenu()">Failure Modes</a>
     <a href="#how-it-works" onclick="closeMobileMenu()">How It Works</a>
+    <a href="#ecosystem" onclick="closeMobileMenu()">Ecosystem</a>
     <a href="#pricing" onclick="closeMobileMenu()">Pricing</a>
     <a href="https://github.com/Aimaghsoodi/FailSafe" target="_blank" rel="noopener">GitHub</a>
     <a href="#pricing" class="btn-primary" onclick="closeMobileMenu()">Start Free</a>
@@ -2373,6 +2796,259 @@
 <span class="cm"># Get failure analytics</span>
 <span class="var">$</span> <span class="fn">curl</span> <span class="str">https://api.failsafe.dev/v1/report?hours=24</span> <span class="op">\</span>
   <span class="op">-H</span> <span class="str">"Authorization: Bearer fs_live_..."</span></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ============================================================
+       PYTHON PACKAGE
+       ============================================================ -->
+  <section class="python-section" id="ecosystem">
+    <div class="container">
+      <div class="eyebrow reveal">Python Package</div>
+      <h2 class="section-title reveal reveal-delay-1">First-Class Python Support</h2>
+      <p class="section-subtitle reveal reveal-delay-2">
+        Build failure reports, calculate composite risk scores, and integrate FailSafe into any Python workflow with a single <code style="color:#f8fafc;background:rgba(239,68,68,0.08);padding:2px 8px;border-radius:4px;font-size:16px;">pip install</code>.
+      </p>
+
+      <div class="python-grid">
+        <div class="python-info reveal reveal-delay-3">
+          <h3>Install in Seconds</h3>
+          <div class="install-commands">
+            <div class="install-cmd">
+              <span class="prompt">$</span>
+              <code>pip install failsafe-ai</code>
+              <button class="copy-btn" onclick="copyToClipboard('pip install failsafe-ai')" aria-label="Copy command">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              </button>
+            </div>
+            <div class="install-cmd">
+              <span class="prompt">$</span>
+              <code>npm install @anthropic/failsafe-sdk</code>
+              <button class="copy-btn" onclick="copyToClipboard('npm install @anthropic/failsafe-sdk')" aria-label="Copy command">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <p>The Python package provides a fluent builder API for constructing structured failure reports, a composite scoring engine for risk assessment, and seamless integration with popular AI frameworks.</p>
+
+          <div class="feature-tags">
+            <span class="feature-tag">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Type Hints
+            </span>
+            <span class="feature-tag">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Async Support
+            </span>
+            <span class="feature-tag">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Builder Pattern
+            </span>
+            <span class="feature-tag">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Composite Scoring
+            </span>
+          </div>
+        </div>
+
+        <div class="python-code-window reveal reveal-delay-4">
+          <div class="code-header">
+            <span class="dot-r"></span>
+            <span class="dot-y"></span>
+            <span class="dot-g"></span>
+            <span class="file-name">report_example.py</span>
+          </div>
+          <pre><span class="kw">from</span> <span class="var">failsafe</span> <span class="kw">import</span> <span class="fn">FailureReportBuilder</span><span class="op">,</span> <span class="fn">calculate_composite_score</span>
+
+<span class="cm"># Build a structured failure report</span>
+<span class="var">report</span> <span class="op">=</span> <span class="fn">FailureReportBuilder</span><span class="op">()</span>\
+    <span class="op">.</span><span class="fn">set_title</span><span class="op">(</span><span class="str">"Hallucination in customer-facing bot"</span><span class="op">)</span>\
+    <span class="op">.</span><span class="fn">set_severity</span><span class="op">(</span><span class="str">"high"</span><span class="op">)</span>\
+    <span class="op">.</span><span class="fn">set_category</span><span class="op">(</span><span class="str">"output-quality"</span><span class="op">)</span>\
+    <span class="op">.</span><span class="fn">set_failure_type</span><span class="op">(</span><span class="str">"hallucination"</span><span class="op">)</span>\
+    <span class="op">.</span><span class="fn">build</span><span class="op">()</span>
+
+<span class="cm"># Calculate composite risk score</span>
+<span class="var">score</span> <span class="op">=</span> <span class="fn">calculate_composite_score</span><span class="op">(</span><span class="var">report</span><span class="op">)</span>
+
+<span class="fn">print</span><span class="op">(</span><span class="kw">f</span><span class="str">"Risk score: </span><span class="op">{</span><span class="var">score</span><span class="op">.</span><span class="var">overall</span><span class="op">}</span><span class="str">"</span><span class="op">)</span>
+<span class="fn">print</span><span class="op">(</span><span class="kw">f</span><span class="str">"Severity:   </span><span class="op">{</span><span class="var">score</span><span class="op">.</span><span class="var">severity_weight</span><span class="op">}</span><span class="str">"</span><span class="op">)</span>
+<span class="fn">print</span><span class="op">(</span><span class="kw">f</span><span class="str">"Impact:     </span><span class="op">{</span><span class="var">score</span><span class="op">.</span><span class="var">impact_estimate</span><span class="op">}</span><span class="str">"</span><span class="op">)</span></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ============================================================
+       FRAMEWORK INTEGRATIONS
+       ============================================================ -->
+  <section class="frameworks-section" id="frameworks">
+    <div class="container">
+      <div class="eyebrow reveal">Framework Integrations</div>
+      <h2 class="section-title reveal reveal-delay-1">Works with Your AI Stack</h2>
+      <p class="section-subtitle reveal reveal-delay-2">
+        Drop-in integration handlers for CrewAI, LangChain, and OpenAI. Add failure intelligence to your existing agents without rewriting a single line of business logic.
+      </p>
+
+      <div class="frameworks-grid">
+        <!-- CrewAI -->
+        <div class="framework-card reveal reveal-delay-1 tilt-card">
+          <div class="framework-card-header">
+            <div class="framework-card-icon fci-crewai">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>
+            </div>
+            <h3>CrewAI</h3>
+            <span class="framework-badge fb-stable">Stable</span>
+          </div>
+          <p>Monitor multi-agent crews with automatic failure detection across agent handoffs, task delegation, and collaborative reasoning chains.</p>
+          <div class="framework-code">
+            <pre><span class="kw">from</span> <span class="var">failsafe.integrations.crewai</span> <span class="kw">import</span> \
+    <span class="fn">FailSafeCrewAIHandler</span>
+
+<span class="cm"># Attach to your crew</span>
+<span class="var">handler</span> <span class="op">=</span> <span class="fn">FailSafeCrewAIHandler</span><span class="op">()</span>
+<span class="var">crew</span> <span class="op">=</span> <span class="fn">Crew</span><span class="op">(</span>
+    <span class="var">agents</span><span class="op">=[</span><span class="var">researcher</span><span class="op">,</span> <span class="var">writer</span><span class="op">],</span>
+    <span class="var">callbacks</span><span class="op">=[</span><span class="var">handler</span><span class="op">]</span>
+<span class="op">)</span></pre>
+          </div>
+        </div>
+
+        <!-- LangChain -->
+        <div class="framework-card reveal reveal-delay-2 tilt-card">
+          <div class="framework-card-header">
+            <div class="framework-card-icon fci-langchain">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.928-1.532a4.5 4.5 0 00-1.242-7.244l-4.5-4.5a4.5 4.5 0 00-6.364 6.364L4.25 8.355" transform="translate(2,2) scale(0.85)"/></svg>
+            </div>
+            <h3>LangChain</h3>
+            <span class="framework-badge fb-stable">Stable</span>
+          </div>
+          <p>Integrate with LangChain chains and agents. Automatically monitor LLM calls, tool usage, retrieval quality, and chain-of-thought reasoning.</p>
+          <div class="framework-code">
+            <pre><span class="kw">from</span> <span class="var">failsafe.integrations.langchain</span> <span class="kw">import</span> \
+    <span class="fn">FailSafeLangChainHandler</span>
+
+<span class="cm"># Add as a callback handler</span>
+<span class="var">handler</span> <span class="op">=</span> <span class="fn">FailSafeLangChainHandler</span><span class="op">()</span>
+<span class="var">chain</span> <span class="op">=</span> <span class="fn">LLMChain</span><span class="op">(</span>
+    <span class="var">llm</span><span class="op">=</span><span class="var">llm</span><span class="op">,</span>
+    <span class="var">callbacks</span><span class="op">=[</span><span class="var">handler</span><span class="op">]</span>
+<span class="op">)</span></pre>
+          </div>
+        </div>
+
+        <!-- OpenAI -->
+        <div class="framework-card reveal reveal-delay-3 tilt-card">
+          <div class="framework-card-header">
+            <div class="framework-card-icon fci-openai">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"/></svg>
+            </div>
+            <h3>OpenAI</h3>
+            <span class="framework-badge fb-stable">Stable</span>
+          </div>
+          <p>Wrap the OpenAI client with FailSafe monitoring. Catch hallucinations, token limit issues, and safety violations on every API call.</p>
+          <div class="framework-code">
+            <pre><span class="kw">from</span> <span class="var">failsafe.integrations.openai</span> <span class="kw">import</span> \
+    <span class="fn">FailSafeOpenAIWrapper</span>
+
+<span class="cm"># Wrap your OpenAI client</span>
+<span class="var">wrapper</span> <span class="op">=</span> <span class="fn">FailSafeOpenAIWrapper</span><span class="op">(</span>
+    <span class="var">api_key</span><span class="op">=</span><span class="str">"sk-..."</span>
+<span class="op">)</span>
+<span class="var">response</span> <span class="op">=</span> <span class="var">wrapper</span><span class="op">.</span><span class="fn">chat</span><span class="op">(</span><span class="var">prompt</span><span class="op">)</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ============================================================
+       CHATGPT & CLAUDE INTEGRATION
+       ============================================================ -->
+  <section class="assistants-section" id="ai-assistants">
+    <div class="container">
+      <div class="eyebrow reveal">AI Assistant Integration</div>
+      <h2 class="section-title reveal reveal-delay-1">Connect to ChatGPT &amp; Claude</h2>
+      <p class="section-subtitle reveal reveal-delay-2">
+        Use FailSafe as a ChatGPT Custom GPT Action via OpenAPI, or integrate natively with Claude through the Model Context Protocol (MCP).
+      </p>
+
+      <div class="assistants-grid">
+        <!-- ChatGPT / OpenAPI -->
+        <div class="assistant-card reveal reveal-delay-3 tilt-card">
+          <div class="assistant-card-header">
+            <div class="assistant-card-icon aci-chatgpt">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"/></svg>
+            </div>
+            <div>
+              <h3>ChatGPT Custom GPT</h3>
+              <span class="assistant-badge ab-openapi">OpenAPI</span>
+            </div>
+          </div>
+          <p>Turn FailSafe into a ChatGPT Skill using the OpenAPI specification. Your Custom GPT can submit failure reports, query the taxonomy, and calculate risk scores through natural conversation.</p>
+
+          <div class="assistant-steps">
+            <div class="assistant-step">
+              <span class="assistant-step-num asn-green">1</span>
+              <p>Copy the OpenAPI spec from <code>spec/openapi.yaml</code> in the <a href="https://github.com/Aimaghsoodi/FailSafe" target="_blank" rel="noopener" style="color:#22c55e;">GitHub repo</a></p>
+            </div>
+            <div class="assistant-step">
+              <span class="assistant-step-num asn-green">2</span>
+              <p>In ChatGPT, go to <strong style="color:#f8fafc;">Explore GPTs</strong> &rarr; <strong style="color:#f8fafc;">Create</strong> &rarr; <strong style="color:#f8fafc;">Configure</strong> &rarr; <strong style="color:#f8fafc;">Actions</strong></p>
+            </div>
+            <div class="assistant-step">
+              <span class="assistant-step-num asn-green">3</span>
+              <p>Paste the OpenAPI schema and set authentication. Your GPT can now report and analyze AI failures.</p>
+            </div>
+          </div>
+
+          <a href="https://github.com/Aimaghsoodi/FailSafe/blob/main/spec/openapi.yaml" target="_blank" rel="noopener" class="assistant-link">
+            View OpenAPI Spec
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+
+        <!-- Claude / MCP -->
+        <div class="assistant-card reveal reveal-delay-4 tilt-card">
+          <div class="assistant-card-header">
+            <div class="assistant-card-icon aci-claude">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"/></svg>
+            </div>
+            <div>
+              <h3>Claude MCP Server</h3>
+              <span class="assistant-badge ab-mcp">MCP Native</span>
+            </div>
+          </div>
+          <p>Integrate FailSafe directly with Claude via the Model Context Protocol. The MCP server exposes failure reporting tools that Claude can invoke natively during conversations.</p>
+
+          <div class="assistant-steps">
+            <div class="assistant-step">
+              <span class="assistant-step-num asn-orange">1</span>
+              <p>Install the MCP server: <code>npm install @anthropic/failsafe-mcp</code></p>
+            </div>
+            <div class="assistant-step">
+              <span class="assistant-step-num asn-orange">2</span>
+              <p>Add to your Claude Desktop config or MCP client configuration</p>
+            </div>
+            <div class="assistant-step">
+              <span class="assistant-step-num asn-orange">3</span>
+              <p>Claude can now submit failure reports, browse the taxonomy, and score risks using FailSafe tools</p>
+            </div>
+          </div>
+
+          <a href="https://github.com/Aimaghsoodi/FailSafe/tree/main/packages/failsafe-mcp" target="_blank" rel="noopener" class="assistant-link">
+            View MCP Package
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
         </div>
       </div>
     </div>
