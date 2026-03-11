@@ -16,6 +16,22 @@
     /* ============================================================
        RESET & BASE
        ============================================================ */
+    :root {
+      --primary: #ef4444;
+      --primary-rgb: 239, 68, 68;
+      --secondary: #f97316;
+      --secondary-rgb: 249, 115, 22;
+      --bg-dark: #030712;
+      --bg-surface: #0f0a1a;
+      --bg-card: rgba(15, 10, 26, 0.6);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --font-heading: 'Space Grotesk', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
     *, *::before, *::after {
       margin: 0;
       padding: 0;
@@ -28,9 +44,9 @@
     }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #030712;
-      color: #f8fafc;
+      font-family: var(--font-body), -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
       line-height: 1.7;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
@@ -38,13 +54,13 @@
     }
 
     h1, h2, h3, h4, h5, h6 {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: var(--font-heading);
       line-height: 1.2;
       font-weight: 700;
     }
 
     code, pre, .mono {
-      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-family: var(--font-mono), 'Fira Code', monospace;
     }
 
     a {
@@ -172,12 +188,12 @@
       align-items: center;
       gap: 6px;
       padding: 6px 12px;
-      background: rgba(239, 68, 68, 0.08);
-      border: 1px solid rgba(239, 68, 68, 0.15);
+      background: rgba(var(--primary-rgb), 0.08);
+      border: 1px solid rgba(var(--primary-rgb), 0.15);
       border-radius: 20px;
       font-size: 11px;
-      font-family: 'JetBrains Mono', monospace;
-      color: rgba(239, 68, 68, 0.4);
+      font-family: var(--font-mono), monospace;
+      color: rgba(var(--primary-rgb), 0.4);
       white-space: nowrap;
       opacity: 0;
       animation: alertFloat 12s ease-in-out infinite;
@@ -269,7 +285,7 @@
       background: rgba(3, 7, 18, 0.85);
       backdrop-filter: blur(20px) saturate(1.4);
       -webkit-backdrop-filter: blur(20px) saturate(1.4);
-      border-bottom: 1px solid rgba(239, 68, 68, 0.08);
+      border-bottom: 1px solid rgba(var(--primary-rgb), 0.08);
       padding: 10px 0;
     }
 
@@ -286,10 +302,10 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: var(--font-heading);
       font-weight: 700;
       font-size: 22px;
-      color: #f8fafc;
+      color: var(--text-primary);
       z-index: 1001;
     }
 
@@ -307,7 +323,7 @@
     .navbar-links a {
       font-size: 14px;
       font-weight: 500;
-      color: #94a3b8;
+      color: var(--text-secondary);
       transition: color 0.25s ease;
       position: relative;
     }
@@ -319,13 +335,13 @@
       left: 0;
       width: 0;
       height: 2px;
-      background: linear-gradient(90deg, #ef4444, #f97316);
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
       border-radius: 1px;
       transition: width 0.3s ease;
     }
 
     .navbar-links a:hover {
-      color: #f8fafc;
+      color: var(--text-primary);
     }
 
     .navbar-links a:hover::after {
@@ -361,7 +377,7 @@
       font-size: 14px;
       font-weight: 600;
       color: #fff;
-      background: linear-gradient(135deg, #ef4444, #f97316);
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
       border-radius: 8px;
       transition: all 0.3s ease;
       position: relative;
@@ -385,7 +401,7 @@
 
     .btn-cta-sm:hover {
       transform: translateY(-1px);
-      box-shadow: 0 8px 24px rgba(239, 68, 68, 0.3);
+      box-shadow: 0 8px 24px rgba(var(--primary-rgb), 0.3);
     }
 
     /* Hamburger */
@@ -2077,9 +2093,52 @@
     @media (max-width: 768px) {
       .frameworks-grid { grid-template-columns: 1fr; }
     }
+
+    /* ============================================================
+       SCROLL PROGRESS BAR
+       ============================================================ */
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      z-index: 1001;
+      width: 0%;
+      transition: width 0.1s linear;
+      pointer-events: none;
+    }
+
+    /* ============================================================
+       SELECTION STYLING
+       ============================================================ */
+    ::selection {
+      background: rgba(var(--primary-rgb), 0.3);
+      color: #fff;
+    }
+
+    ::-moz-selection {
+      background: rgba(var(--primary-rgb), 0.3);
+      color: #fff;
+    }
+
+    /* ============================================================
+       REDUCED MOTION
+       ============================================================ */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
   </style>
 </head>
 <body>
+
+  <!-- Scroll Progress Bar -->
+  <div class="scroll-progress" id="scrollProgress"></div>
 
   <!-- ============================================================
        BACKGROUND ELEMENTS
@@ -3706,6 +3765,20 @@
         }
       });
     });
+
+    /* ==========================================================
+       13. SCROLL PROGRESS BAR
+       ========================================================== */
+    (function initScrollProgress() {
+      const progressBar = document.getElementById('scrollProgress');
+      if (!progressBar) return;
+      window.addEventListener('scroll', function () {
+        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const progress = (scrollTop / scrollHeight) * 100;
+        progressBar.style.width = progress + '%';
+      }, { passive: true });
+    })();
   </script>
 </body>
 </html>
