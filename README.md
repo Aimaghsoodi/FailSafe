@@ -41,6 +41,43 @@ console.log(report.id);                 // "report_V1StGXR8..."
 console.log(report.verificationStatus); // "unverified"
 ```
 
+### Python Package
+
+```bash
+pip install -e packages/failsafe-py
+```
+
+```python
+from failsafe import (
+    create_failure_report,
+    calculate_impact_score,
+    calculate_urgency_score,
+    calculate_composite_score,
+    validate_failure_report,
+)
+
+report = create_failure_report(
+    "security.prompt_injection",
+    "critical",
+    "security",
+    "Prompt injection blocked",
+    "User input attempted to override the system prompt",
+)
+
+print(report.model_dump(include={"type", "severity", "domain", "title", "verification_status"}))
+print({
+    "impact": calculate_impact_score(report),
+    "urgency": calculate_urgency_score(report),
+    "composite": calculate_composite_score(report),
+    "valid": validate_failure_report(report)["valid"],
+})
+```
+
+```text
+{'type': 'security.prompt_injection', 'severity': 'critical', 'domain': 'security', 'title': 'Prompt injection blocked', 'verification_status': 'unverified'}
+{'impact': 98, 'urgency': 100, 'composite': 99, 'valid': True}
+```
+
 ### Builder Pattern
 
 ```typescript
@@ -234,6 +271,7 @@ The MCP server exposes tools for submitting failure reports, checking risks, sea
 | Package | Description |
 |---------|-------------|
 | [`@failsafe/core`](./packages/failsafe-core/) | Core library — failure reporting, taxonomy, scoring, matching, validation |
+| [`failsafe-ai`](./packages/failsafe-py/) | Python library — report creation, scoring, validation, filtering |
 | [`@failsafe/mcp-server`](./packages/failsafe-mcp/) | MCP server — expose failure intelligence to AI agents |
 | [`@failsafe/api`](./packages/failsafe-api/) | REST API server with Hono |
 

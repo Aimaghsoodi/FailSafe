@@ -1815,6 +1815,41 @@
     .python-code-window .type { color: #f472b6; }
     .python-code-window .op { color: #94a3b8; }
 
+    .python-output {
+      border-top: 1px solid rgba(239, 68, 68, 0.1);
+      background: rgba(3, 7, 18, 0.65);
+      padding: 20px 24px 24px;
+    }
+
+    .python-output-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #22c55e;
+    }
+
+    .python-output-label::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.12);
+    }
+
+    .python-output pre {
+      padding: 0;
+      color: #cbd5e1;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
     /* ============================================================
        FRAMEWORK INTEGRATIONS SECTION
        ============================================================ */
@@ -2879,21 +2914,21 @@
           <div class="install-commands">
             <div class="install-cmd">
               <span class="prompt">$</span>
-              <code>pip install failsafe-ai</code>
-              <button class="copy-btn" onclick="copyToClipboard('pip install failsafe-ai')" aria-label="Copy command">
+              <code>pip install -e packages/failsafe-py</code>
+              <button class="copy-btn" onclick="copyToClipboard('pip install -e packages/failsafe-py')" aria-label="Copy command">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
               </button>
             </div>
             <div class="install-cmd">
               <span class="prompt">$</span>
-              <code>npm install @anthropic/failsafe-sdk</code>
-              <button class="copy-btn" onclick="copyToClipboard('npm install @anthropic/failsafe-sdk')" aria-label="Copy command">
+              <code>py -3.11 -m pytest packages/failsafe-py/tests</code>
+              <button class="copy-btn" onclick="copyToClipboard('py -3.11 -m pytest packages/failsafe-py/tests')" aria-label="Copy command">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
               </button>
             </div>
           </div>
 
-          <p>The Python package provides a fluent builder API for constructing structured failure reports, a composite scoring engine for risk assessment, and seamless integration with popular AI frameworks.</p>
+          <p>The Python package turns an AI failure into a structured report, then scores and validates it in one pass. The example below is the exact output from a local smoke run.</p>
 
           <div class="feature-tags">
             <span class="feature-tag">
@@ -2922,22 +2957,34 @@
             <span class="dot-g"></span>
             <span class="file-name">report_example.py</span>
           </div>
-          <pre><span class="kw">from</span> <span class="var">failsafe</span> <span class="kw">import</span> <span class="fn">FailureReportBuilder</span><span class="op">,</span> <span class="fn">calculate_composite_score</span>
+          <pre><span class="kw">from</span> <span class="var">failsafe</span> <span class="kw">import</span> <span class="op">(</span>
+    <span class="fn">create_failure_report</span><span class="op">,</span>
+    <span class="fn">calculate_impact_score</span><span class="op">,</span>
+    <span class="fn">calculate_urgency_score</span><span class="op">,</span>
+    <span class="fn">calculate_composite_score</span><span class="op">,</span>
+    <span class="fn">validate_failure_report</span><span class="op">,</span>
+<span class="op">)</span>
 
-<span class="cm"># Build a structured failure report</span>
-<span class="var">report</span> <span class="op">=</span> <span class="fn">FailureReportBuilder</span><span class="op">()</span>\
-    <span class="op">.</span><span class="fn">set_title</span><span class="op">(</span><span class="str">"Hallucination in customer-facing bot"</span><span class="op">)</span>\
-    <span class="op">.</span><span class="fn">set_severity</span><span class="op">(</span><span class="str">"high"</span><span class="op">)</span>\
-    <span class="op">.</span><span class="fn">set_category</span><span class="op">(</span><span class="str">"output-quality"</span><span class="op">)</span>\
-    <span class="op">.</span><span class="fn">set_failure_type</span><span class="op">(</span><span class="str">"hallucination"</span><span class="op">)</span>\
-    <span class="op">.</span><span class="fn">build</span><span class="op">()</span>
+<span class="var">report</span> <span class="op">=</span> <span class="fn">create_failure_report</span><span class="op">(</span>
+    <span class="str">"security.prompt_injection"</span><span class="op">,</span>
+    <span class="str">"critical"</span><span class="op">,</span>
+    <span class="str">"security"</span><span class="op">,</span>
+    <span class="str">"Prompt injection blocked"</span><span class="op">,</span>
+    <span class="str">"User input attempted to override the system prompt"</span><span class="op">,</span>
+<span class="op">)</span>
 
-<span class="cm"># Calculate composite risk score</span>
-<span class="var">score</span> <span class="op">=</span> <span class="fn">calculate_composite_score</span><span class="op">(</span><span class="var">report</span><span class="op">)</span>
-
-<span class="fn">print</span><span class="op">(</span><span class="kw">f</span><span class="str">"Risk score: </span><span class="op">{</span><span class="var">score</span><span class="op">.</span><span class="var">overall</span><span class="op">}</span><span class="str">"</span><span class="op">)</span>
-<span class="fn">print</span><span class="op">(</span><span class="kw">f</span><span class="str">"Severity:   </span><span class="op">{</span><span class="var">score</span><span class="op">.</span><span class="var">severity_weight</span><span class="op">}</span><span class="str">"</span><span class="op">)</span>
-<span class="fn">print</span><span class="op">(</span><span class="kw">f</span><span class="str">"Impact:     </span><span class="op">{</span><span class="var">score</span><span class="op">.</span><span class="var">impact_estimate</span><span class="op">}</span><span class="str">"</span><span class="op">)</span></pre>
+<span class="fn">print</span><span class="op">(</span><span class="var">report</span><span class="op">.</span><span class="fn">model_dump</span><span class="op">(</span><span class="var">include</span><span class="op">={</span><span class="str">"type"</span><span class="op">,</span> <span class="str">"severity"</span><span class="op">,</span> <span class="str">"domain"</span><span class="op">,</span> <span class="str">"title"</span><span class="op">,</span> <span class="str">"verification_status"</span><span class="op">}</span><span class="op">))</span>
+<span class="fn">print</span><span class="op">(</span><span class="op">{</span>
+    <span class="str">"impact"</span><span class="op">:</span> <span class="fn">calculate_impact_score</span><span class="op">(</span><span class="var">report</span><span class="op">),</span>
+    <span class="str">"urgency"</span><span class="op">:</span> <span class="fn">calculate_urgency_score</span><span class="op">(</span><span class="var">report</span><span class="op">),</span>
+    <span class="str">"composite"</span><span class="op">:</span> <span class="fn">calculate_composite_score</span><span class="op">(</span><span class="var">report</span><span class="op">),</span>
+    <span class="str">"valid"</span><span class="op">:</span> <span class="fn">validate_failure_report</span><span class="op">(</span><span class="var">report</span><span class="op">)[</span><span class="str">"valid"</span><span class="op">],</span>
+<span class="op">})</span></pre>
+          <div class="python-output">
+            <div class="python-output-label">Output</div>
+            <pre>{'type': 'security.prompt_injection', 'severity': 'critical', 'domain': 'security', 'title': 'Prompt injection blocked', 'verification_status': 'unverified'}
+{'impact': 98, 'urgency': 100, 'composite': 99, 'valid': True}</pre>
+          </div>
         </div>
       </div>
     </div>
